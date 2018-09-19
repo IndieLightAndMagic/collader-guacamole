@@ -1,4 +1,5 @@
 #include "tinyxml2/tinyxml2.h"
+#include "glm/glm.hpp"
 
 #include <iostream>
 #include <map>
@@ -13,6 +14,7 @@ namespace GTech {
     struct IdName {
         std::string id;
         std::string name;
+        glm::vec3 color;
         virtual void setIdName(const tinyxml2::XMLAttribute* pa){
             id = pa->Value();
             name = pa->Next()->Value();
@@ -37,12 +39,11 @@ namespace GTech {
         float constant_attenuation{1.0f};
         float linear_attenuaton{0.0f};
         float quadratic_attenuation{0.001111f};
-        struct {
-            float r{1.0f};
-            float g{0.0f};
-            float b{0.0f};
-        }color;
+
+        glm::vec3 color{1.0f, 0.0f, 0.0f};
         LightType lightType{GTech::Light::LightType::POINT};
+
+
     };
 
     struct ShadingModel : public GTech::IdName{
@@ -50,27 +51,17 @@ namespace GTech {
     	void setIdName(const tinyxml2::XMLAttribute* pa){
     		id = pa->Value();
     	}
-
-        struct {
-            float r,g,b,a;
-        }emission;
-        struct {
-            float r,g,b,a;
-        }ambient;
-        struct {
-            float r,g,b,a;
-        }diffuse;
-        struct {
-            float r,g,b,a;
-        }specular;
-        float shininess;
+        glm::vec4   emission;
+        glm::vec4   ambient;
+        glm::vec4   diffuse;
+        glm::vec4   specular;
+        float       shininess;
     };
     struct Scene : public GTech::IdName {
 
         std::string authoring_tool;
         std::string created;
         std::string modified;
-
 
         bool z_up{false};
         std::map<std::string, GTech::Camera> cameras{};
@@ -181,6 +172,7 @@ public:
 
             } else if (visitorState == VisitorState::library_effects){
 
+                
 
             }
         }

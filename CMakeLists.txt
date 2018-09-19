@@ -14,5 +14,9 @@ message(STATUS "CMAKE_SOURCE_DIR: ${CMAKE_SOURCE_DIR}")
 message(STATUS "CMAKE_CURRENT_BINARY_DIR: ${CMAKE_CURRENT_BINARY_DIR}")
 message(STATUS "-----------------------------")
 
-add_executable(${TARGET_NAME} collader.cpp tinyxml2/tinyxml2.cpp tinyxml2/tinyxml2.h)
+#GLM
+set(GLM_DIR "${ROOT_DIR}/../GLM")
 
+
+add_executable(${TARGET_NAME} collader.cpp tinyxml2/tinyxml2.cpp tinyxml2/tinyxml2.h)
+target_include_directories(${TARGET_NAME} PUBLIC ${GLM_DIR})
