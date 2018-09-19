@@ -5,8 +5,8 @@
       <author>Blender User</author>
       <authoring_tool>Blender 2.79.0 commit date:2018-03-22, commit time:14:10, hash:f4dc9f9</authoring_tool>
     </contributor>
-    <created>2018-09-18T16:43:21</created>
-    <modified>2018-09-18T16:43:21</modified>
+    <created>2018-09-18T11:43:24</created>
+    <modified>2018-09-18T11:43:24</modified>
     <unit name="meter" meter="1"/>
     <up_axis>Z_UP</up_axis>
   </asset>
@@ -35,7 +35,7 @@
     <light id="Lamp-light" name="mucha-lampara">
       <technique_common>
         <point>
-          <color sid="color">0.5166461 0.08016718 1</color>
+          <color sid="color">1 1 1</color>
           <constant_attenuation>1</constant_attenuation>
           <linear_attenuation>0</linear_attenuation>
           <quadratic_attenuation>0.00111109</quadratic_attenuation>
@@ -47,8 +47,8 @@
           <flag sid="flag" type="int">0</flag>
           <mode sid="mode" type="int">8192</mode>
           <gamma sid="blender_gamma" type="float">1</gamma>
-          <red sid="red" type="float">0.5166461</red>
-          <green sid="green" type="float">0.08016717</green>
+          <red sid="red" type="float">1</red>
+          <green sid="green" type="float">1</green>
           <blue sid="blue" type="float">1</blue>
           <shadow_r sid="blender_shadow_r" type="float">0</shadow_r>
           <shadow_g sid="blender_shadow_g" type="float">0</shadow_g>
