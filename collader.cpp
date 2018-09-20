@@ -11,6 +11,8 @@ using namespace std;
 
 
 namespace GTech {
+
+
     struct IdName {
         std::string id;
         std::string name;
@@ -46,7 +48,7 @@ namespace GTech {
 
     };
 
-    struct ShadingModel : public GTech::IdName{
+    struct Material : public GTech::IdName{
 
     	void setIdName(const tinyxml2::XMLAttribute* pa){
     		id = pa->Value();
@@ -66,7 +68,7 @@ namespace GTech {
         bool z_up{false};
         std::map<std::string, GTech::Camera> cameras{};
         std::map<std::string, GTech::Light> lights{};
-        std::map<std::string, GTech::ShadingModel> shadingmodels{};
+        std::map<std::string, GTech::Material> shadingmodels{};
         std::vector<float> vertices{};
 
     };
@@ -78,6 +80,7 @@ namespace GTech {
 GTech::Scene aScene;
 GTech::Camera aCamera;
 GTech::Light aLight;
+GTech::Material aMaterial;
 
 class ColladaVisitor : public XMLVisitor {
 
@@ -164,21 +167,45 @@ public:
         } else if (eName == "color") {
 
             auto colorText = std::stringstream{e.GetText()};
+            auto setRGBColor = [&](auto& rgbVector){
+
+                colorText >> rgbVector.r;
+                colorText >> rgbVector.g;
+                colorText >> rgbVector.b;
+                return;
+            };
+            auto setRGBAColor = [&](auto& rgbaVector){
+
+                setRGBColor(rgbaVector);
+                colorText >> rgbaVector.a;
+
+            };
             if (visitorState == VisitorState::library_lights){
 
-                colorText >> aLight.color.r;
-                colorText >> aLight.color.g;
-                colorText >> aLight.color.b;
+                setRGBColor(aLight.color);
 
             } else if (visitorState == VisitorState::library_effects){
 
-                
+                auto materialPropertyName = std::string{pa->Value()};
+                std::map<std::string, glm::vec4> propertyVectorMap {
+                    std::make_pair("emission", aMaterial.emission),
+                    std::make_pair("ambient", aMaterial.ambient),
+                    std::make_pair("diffuse", aMaterial.diffuse),
+                    std::make_pair("specular", aMaterial.specular)
+                };
+                setRGBAColor(propertyVectorMap[materialPropertyName]);
 
             }
+
+        } else if (eName == "effect") {
+
+            
+
         }
 
         return true;
     }
+
     bool VisitExit(const XMLElement& e){
 
         auto eName = std::string{e.Name()};
@@ -186,12 +213,17 @@ public:
         if (eName == "camera"){
 
             aScene.cameras[aCamera.id] = aCamera;
-        }
-        else if (eName == "light"){
+
+        } else if (eName == "light"){
 
             aScene.lights[aLight.id] = aLight;
 
+        } else if (eName == "effect"){
+
+            if (visitorState == VisitorState::)
+
         }
+
         return true;
 
     }
