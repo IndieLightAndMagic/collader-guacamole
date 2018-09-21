@@ -1,10 +1,14 @@
+//http://www.wazim.com/Collada_Tutorial_1.htm
+
 #include "tinyxml2/tinyxml2.h"
 #include "glm/glm.hpp"
 
+#include <cassert>
 #include <iostream>
 #include <map>
-#include <vector>
 #include <sstream>
+#include <utility>
+#include <vector>
 
 using namespace tinyxml2;
 using namespace std;
@@ -18,8 +22,11 @@ namespace GTech {
         std::string name;
         glm::vec3 color;
         virtual void setIdName(const tinyxml2::XMLAttribute* pa){
-            id = pa->Value();
-            name = pa->Next()->Value();
+            assert(pa != nullptr);
+            if (pa) id = pa->Value();
+            auto next = pa->Next();
+            assert(next != nullptr);
+            if (next) name = next->Value();
         }
     };
 
@@ -48,17 +55,40 @@ namespace GTech {
 
     };
 
+    using IdxSz = std::pair<unsigned int, unsigned int >; //Index and sizes;
+    struct Mesh : public GTech::IdName {
+
+        //PAIR INDEX , SIZE
+        IdxSz vertices{std::make_pair(0,0)};
+        IdxSz normals{std::make_pair(0,0)};
+        IdxSz texcoords{std::make_pair(0,0)};
+
+        enum class DataType {NONE, TEXCOORDS, NORMALS, VERTICES};
+        std::stringstream   temporalStringStream{};
+        std::string         temporalStrideXYZ{};
+        Mesh::DataType      temporalDataType{Mesh::DataType::NONE};
+        unsigned int        temporalNextIndexToWrite{0};
+    };
+
     struct Material : public GTech::IdName{
 
-    	void setIdName(const tinyxml2::XMLAttribute* pa){
-    		id = pa->Value();
+    	void setIdName(const tinyxml2::XMLAttribute* pa, std::string stringToStrip){
+
+    	    assert(pa);
+    	    if (pa) id = pa->Value();
+            auto stripIndex = id.find(stringToStrip);
+            name = id.substr(0, stripIndex);
+
     	}
-        glm::vec4   emission;
+
+    	glm::vec4   emission;
         glm::vec4   ambient;
         glm::vec4   diffuse;
         glm::vec4   specular;
         float       shininess;
+
     };
+
     struct Scene : public GTech::IdName {
 
         std::string authoring_tool;
@@ -68,8 +98,10 @@ namespace GTech {
         bool z_up{false};
         std::map<std::string, GTech::Camera> cameras{};
         std::map<std::string, GTech::Light> lights{};
-        std::map<std::string, GTech::Material> shadingmodels{};
-        std::vector<float> vertices{};
+        std::map<std::string, GTech::Material> materials{};
+        std::map<std::string, GTech::Mesh> meshes{};
+        std::vector<float> geometricalData{};
+
 
     };
 
@@ -81,6 +113,7 @@ GTech::Scene aScene;
 GTech::Camera aCamera;
 GTech::Light aLight;
 GTech::Material aMaterial;
+GTech::Mesh aMesh;
 
 class ColladaVisitor : public XMLVisitor {
 
@@ -116,6 +149,7 @@ private:
     };
 public:
     VisitorState visitorState{VisitorState::none};
+
     bool VisitEnter(const XMLElement& e, const XMLAttribute* pa)
     {
         auto eName = std::string{e.Name()};
@@ -167,31 +201,31 @@ public:
         } else if (eName == "color") {
 
             auto colorText = std::stringstream{e.GetText()};
-            auto setRGBColor = [&](auto& rgbVector){
+            auto setRGBColor = [&](auto rgbVector){
 
-                colorText >> rgbVector.r;
-                colorText >> rgbVector.g;
-                colorText >> rgbVector.b;
+                colorText >> rgbVector->r;
+                colorText >> rgbVector->g;
+                colorText >> rgbVector->b;
                 return;
             };
-            auto setRGBAColor = [&](auto& rgbaVector){
+            auto setRGBAColor = [&](auto rgbaVector){
 
                 setRGBColor(rgbaVector);
-                colorText >> rgbaVector.a;
+                colorText >> rgbaVector->a;
 
             };
             if (visitorState == VisitorState::library_lights){
 
-                setRGBColor(aLight.color);
+                setRGBColor(&aLight.color);
 
             } else if (visitorState == VisitorState::library_effects){
 
                 auto materialPropertyName = std::string{pa->Value()};
-                std::map<std::string, glm::vec4> propertyVectorMap {
-                    std::make_pair("emission", aMaterial.emission),
-                    std::make_pair("ambient", aMaterial.ambient),
-                    std::make_pair("diffuse", aMaterial.diffuse),
-                    std::make_pair("specular", aMaterial.specular)
+                std::map<std::string, glm::vec4*> propertyVectorMap {
+                    std::make_pair("emission", &aMaterial.emission),
+                    std::make_pair("ambient", &aMaterial.ambient),
+                    std::make_pair("diffuse", &aMaterial.diffuse),
+                    std::make_pair("specular", &aMaterial.specular)
                 };
                 setRGBAColor(propertyVectorMap[materialPropertyName]);
 
@@ -199,7 +233,44 @@ public:
 
         } else if (eName == "effect") {
 
+            aMaterial = GTech::Material{};
+            aMaterial.setIdName(pa,"-effect");
             
+        } else if (eName == "geometry") {
+
+            aMesh = GTech::Mesh{};
+            aMesh.setIdName(pa);
+
+        } else if (eName == "param") {
+
+            aMesh.temporalStrideXYZ += pa->Value();
+            
+        } else if (eName == "accessor") {
+
+            aMesh.temporalStrideXYZ = std::string{};
+
+            auto paux = pa->Next();
+            auto countStrideStream = std::stringstream{std::string{paux->Value()} + std::string{" "} + std::string{paux->Next()->Value()}};
+            int count, stride; countStrideStream >> count; countStrideStream >> stride; int numelements = count * stride;
+
+            aMesh.temporalNextIndexToWrite = aScene.geometricalData.size();
+            aScene.geometricalData.resize(aMesh.temporalNextIndexToWrite + numelements);
+
+        } else if (eName == "source"){
+
+            std::vector<std::string> tokens {"-positions", "-normals", "-texcoords"};
+            auto sourceIdString = std::string{pa->Value()};
+            for (auto token : tokens){
+                if (aMesh.id + token == sourceIdString) {
+                    if      ( token == tokens[0] )  aMesh.temporalDataType = GTech::Mesh::DataType::VERTICES;
+                    else if ( token == tokens[1] )  aMesh.temporalDataType = GTech::Mesh::DataType::NORMALS;
+                    else if ( token == tokens[2] )  aMesh.temporalDataType = GTech::Mesh::DataType::TEXCOORDS;
+                }
+            }
+
+        } else if (eName == "float_array") {
+
+            aMesh.temporalStringStream = std::stringstream{std::string{e.GetText()}};
 
         }
 
@@ -212,15 +283,61 @@ public:
 
         if (eName == "camera"){
 
-            aScene.cameras[aCamera.id] = aCamera;
+            aScene.cameras[aCamera.name] = aCamera;
 
         } else if (eName == "light"){
 
-            aScene.lights[aLight.id] = aLight;
+            aScene.lights[aLight.name] = aLight;
 
         } else if (eName == "effect"){
 
-            if (visitorState == VisitorState::)
+            aScene.materials[aMaterial.name] = aMaterial;
+
+        } else if (eName == "source"){
+
+            auto numelements    = aScene.geometricalData.size() - aMesh.temporalNextIndexToWrite;
+            auto keyPair        = std::make_pair(aMesh.temporalNextIndexToWrite, numelements);
+
+            if (aMesh.temporalDataType == GTech::Mesh::DataType::VERTICES) {
+
+                aMesh.vertices  = keyPair;
+
+            } else if (aMesh.temporalDataType == GTech::Mesh::DataType::NORMALS) {
+
+                aMesh.normals   = keyPair;
+
+            } else if (aMesh.temporalDataType == GTech::Mesh::DataType::TEXCOORDS) {
+
+                aMesh.texcoords = keyPair;
+
+            }
+
+            auto strideSize = aMesh.temporalStrideXYZ.length();
+            glm::vec3 fvector;
+
+            for (auto index = 0; index < numelements; ++index){
+
+                auto strideIndex = index % strideSize;
+
+                auto dimensionToken = aMesh.temporalStrideXYZ.data()[strideIndex];
+                if ( dimensionToken == 'X') {
+                    aMesh.temporalStringStream >> fvector.x;
+                } else if (dimensionToken == 'Y') {
+                    aMesh.temporalStringStream >> fvector.y;
+                } else if (dimensionToken == 'Z') {
+                    aMesh.temporalStringStream >> fvector.z;
+                }
+
+                if (strideIndex == 2) {
+
+                    if (aScene.z_up) std::swap(fvector.y, fvector.z);
+                    auto pfloat = aScene.geometricalData.data();
+                    pfloat [aMesh.temporalNextIndexToWrite++] = fvector.x;
+                    pfloat [aMesh.temporalNextIndexToWrite++] = fvector.y;
+                    pfloat [aMesh.temporalNextIndexToWrite++] = fvector.z;
+                }
+
+            }
 
         }
 
