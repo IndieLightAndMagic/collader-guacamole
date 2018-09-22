@@ -5,8 +5,8 @@
       <author>Blender User</author>
       <authoring_tool>Blender 2.79.0 commit date:2017-09-11, commit time:10:43, hash:5bd8ac9</authoring_tool>
     </contributor>
-    <created>2018-09-19T01:33:23</created>
-    <modified>2018-09-19T01:33:23</modified>
+    <created>2018-09-22T14:36:32</created>
+    <modified>2018-09-22T14:36:32</modified>
     <unit name="meter" meter="1"/>
     <up_axis>Z_UP</up_axis>
   </asset>
@@ -101,9 +101,13 @@
       </extra>
     </light>
   </library_lights>
-  <library_images/>
+  <library_images>
+    <image id="MeinFuhrer_png" name="MeinFuhrer_png">
+      <init_from>MeinFuhrer.png</init_from>
+    </image>
+  </library_images>
   <library_effects>
-    <effect id="TheMaterial-effect">
+    <effect id="BlueMaterial-effect">
       <profile_COMMON>
         <technique sid="common">
           <phong>
@@ -114,7 +118,7 @@
               <color sid="ambient">0 0 0 1</color>
             </ambient>
             <diffuse>
-              <color sid="diffuse">0.64 0.64 0.64 1</color>
+              <color sid="diffuse">0.002532645 0.184809 0.64 1</color>
             </diffuse>
             <specular>
               <color sid="specular">0.5 0.5 0.5 1</color>
@@ -129,7 +133,7 @@
         </technique>
       </profile_COMMON>
     </effect>
-    <effect id="AnotherMaterial-effect">
+    <effect id="RedMaterial-effect">
       <profile_COMMON>
         <technique sid="common">
           <phong>
@@ -140,7 +144,7 @@
               <color sid="ambient">0 0 0 1</color>
             </ambient>
             <diffuse>
-              <color sid="diffuse">0.03238828 0.64 0.03917064 1</color>
+              <color sid="diffuse">0.64 0.05507955 0.1646376 1</color>
             </diffuse>
             <specular>
               <color sid="specular">0.5 0.5 0.5 1</color>
@@ -148,6 +152,45 @@
             <shininess>
               <float sid="shininess">50</float>
             </shininess>
+            <index_of_refraction>
+              <float sid="index_of_refraction">1</float>
+            </index_of_refraction>
+          </phong>
+        </technique>
+      </profile_COMMON>
+    </effect>
+    <effect id="ReichsFuhrerMaterial-effect">
+      <profile_COMMON>
+        <newparam sid="MeinFuhrer_png-surface">
+          <surface type="2D">
+            <init_from>MeinFuhrer_png</init_from>
+          </surface>
+        </newparam>
+        <newparam sid="MeinFuhrer_png-sampler">
+          <sampler2D>
+            <source>MeinFuhrer_png-surface</source>
+          </sampler2D>
+        </newparam>
+        <technique sid="common">
+          <phong>
+            <emission>
+              <color sid="emission">0 0 0 1</color>
+            </emission>
+            <ambient>
+              <color sid="ambient">0 0 0 1</color>
+            </ambient>
+            <diffuse>
+              <texture texture="MeinFuhrer_png-sampler"/>
+            </diffuse>
+            <specular>
+              <color sid="specular">0.5 0.5 0.5 1</color>
+            </specular>
+            <shininess>
+              <float sid="shininess">50</float>
+            </shininess>
+            <transparent opaque="A_ONE">
+              <color>1 1 1 1</color>
+            </transparent>
             <index_of_refraction>
               <float sid="index_of_refraction">1</float>
             </index_of_refraction>
@@ -157,11 +200,14 @@
     </effect>
   </library_effects>
   <library_materials>
-    <material id="TheMaterial-material" name="TheMaterial">
-      <instance_effect url="#TheMaterial-effect"/>
+    <material id="BlueMaterial-material" name="BlueMaterial">
+      <instance_effect url="#BlueMaterial-effect"/>
     </material>
-    <material id="AnotherMaterial-material" name="AnotherMaterial">
-      <instance_effect url="#AnotherMaterial-effect"/>
+    <material id="RedMaterial-material" name="RedMaterial">
+      <instance_effect url="#RedMaterial-effect"/>
+    </material>
+    <material id="ReichsFuhrerMaterial-material" name="ReichsFuhrerMaterial">
+      <instance_effect url="#ReichsFuhrerMaterial-effect"/>
     </material>
   </library_materials>
   <library_geometries>
@@ -187,13 +233,35 @@
             </accessor>
           </technique_common>
         </source>
+        <source id="Cube-mesh-map-0">
+          <float_array id="Cube-mesh-map-0-array" count="72">0 0 0 0 0 0 0 0 0 0 0 0 0.9998997 0.9998997 1.00338e-4 1.00069e-4 0.9999001 9.998e-5 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0.9998997 0.9998997 9.998e-5 0.9998998 1.00338e-4 1.00069e-4 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0</float_array>
+          <technique_common>
+            <accessor source="#Cube-mesh-map-0-array" count="36" stride="2">
+              <param name="S" type="float"/>
+              <param name="T" type="float"/>
+            </accessor>
+          </technique_common>
+        </source>
         <vertices id="Cube-mesh-vertices">
           <input semantic="POSITION" source="#Cube-mesh-positions"/>
         </vertices>
-        <triangles material="TheMaterial-material" count="12">
+        <triangles material="BlueMaterial-material" count="6">
           <input semantic="VERTEX" source="#Cube-mesh-vertices" offset="0"/>
           <input semantic="NORMAL" source="#Cube-mesh-normals" offset="1"/>
-          <p>0 0 2 0 3 0 7 1 5 1 4 1 4 2 1 2 0 2 5 3 2 3 1 3 2 4 7 4 3 4 0 5 7 5 4 5 0 6 1 6 2 6 7 7 6 7 5 7 4 8 5 8 1 8 5 9 6 9 2 9 2 10 6 10 7 10 0 11 3 11 7 11</p>
+          <input semantic="TEXCOORD" source="#Cube-mesh-map-0" offset="2" set="0"/>
+          <p>5 3 9 2 3 10 1 3 11 2 4 12 7 4 13 3 4 14 0 5 15 7 5 16 4 5 17 5 9 27 6 9 28 2 9 29 2 10 30 6 10 31 7 10 32 0 11 33 3 11 34 7 11 35</p>
+        </triangles>
+        <triangles material="RedMaterial-material" count="2">
+          <input semantic="VERTEX" source="#Cube-mesh-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#Cube-mesh-normals" offset="1"/>
+          <input semantic="TEXCOORD" source="#Cube-mesh-map-0" offset="2" set="0"/>
+          <p>7 1 3 5 1 4 4 1 5 7 7 21 6 7 22 5 7 23</p>
+        </triangles>
+        <triangles material="ReichsFuhrerMaterial-material" count="4">
+          <input semantic="VERTEX" source="#Cube-mesh-vertices" offset="0"/>
+          <input semantic="NORMAL" source="#Cube-mesh-normals" offset="1"/>
+          <input semantic="TEXCOORD" source="#Cube-mesh-map-0" offset="2" set="0"/>
+          <p>0 0 0 2 0 1 3 0 2 4 2 6 1 2 7 0 2 8 0 6 18 1 6 19 2 6 20 4 8 24 5 8 25 1 8 26</p>
         </triangles>
       </mesh>
     </geometry>
@@ -206,7 +274,7 @@
         <instance_camera url="#Camera-camera"/>
       </node>
       <node id="Lamp" name="Lamp" type="NODE">
-        <matrix sid="transform">-0.2908646 -0.7711008 0.5663932 4.076245 0.9551712 -0.1998834 0.2183912 1.005454 -0.05518906 0.6045247 0.7946723 5.903862 0 0 0 1</matrix>
+        <matrix sid="transform">-0.2908646 -0.7711008 0.5663932 4.076245 0.9551712 -0.1998834 0.2183912 3.487624 -0.05518906 0.6045247 0.7946723 2.786703 0 0 0 1</matrix>
         <instance_light url="#Lamp-light"/>
       </node>
       <node id="Cube" name="Cube" type="NODE">
@@ -214,8 +282,9 @@
         <instance_geometry url="#Cube-mesh" name="Cube">
           <bind_material>
             <technique_common>
-              <instance_material symbol="TheMaterial-material" target="#TheMaterial-material"/>
-              <instance_material symbol="AnotherMaterial-material" target="#AnotherMaterial-material"/>
+              <instance_material symbol="BlueMaterial-material" target="#BlueMaterial-material"/>
+              <instance_material symbol="RedMaterial-material" target="#RedMaterial-material"/>
+              <instance_material symbol="ReichsFuhrerMaterial-material" target="#ReichsFuhrerMaterial-material"/>
             </technique_common>
           </bind_material>
         </instance_geometry>
