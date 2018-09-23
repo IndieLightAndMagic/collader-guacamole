@@ -18,5 +18,5 @@ message(STATUS "-----------------------------")
 set(GLM_DIR "${ROOT_DIR}/../GLM")
 
 
-add_executable(${TARGET_NAME} collader.cpp tinyxml2/tinyxml2.cpp tinyxml2/tinyxml2.h)
+add_executable(${TARGET_NAME} collader.h collader.cpp tinyxml2/tinyxml2.cpp tinyxml2/tinyxml2.h)
 target_include_directories(${TARGET_NAME} PUBLIC ${GLM_DIR})
