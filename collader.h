@@ -52,23 +52,32 @@ namespace GTech {
 
     };
 
-    using IdxSz = std::pair<unsigned int, unsigned int >; //Index and sizes;
-    struct Mesh : public GTech::IdName {
-
-        std::map<std::string, unsigned int> offsetMap{};
-        std::map<std::string, unsigned int> sizeMap{};
-        std::vector<float> floatVector;
-
-        //PAIR INDEX , SIZE
-        IdxSz vertices{std::make_pair(0,0)};
-        IdxSz normals{std::make_pair(0,0)};
-        IdxSz texcoords{std::make_pair(0,0)};
+    struct InputDataConfig {
 
         enum class DataType {NONE, TEXCOORDS, NORMALS, VERTICES};
-        std::stringstream   temporalStringStream{};
-        std::string         temporalStrideXYZ{};
-        Mesh::DataType      temporalDataType{Mesh::DataType::NONE};
-        unsigned int        temporalNextIndexToWrite{0};
+        GTech::InputDataConfig::DataType    dataType{InputDataConfig::DataType::NONE};
+        std::string                         sourceId{};
+        unsigned int                        offset{0};
+    
+    };
+
+    struct TriangleArray {
+        
+        unsigned int                    count{0};
+        std::string                     materialId{};
+        std::vector<InputDataConfig>    indexArrayInputConfiguration{};
+        std::vector<unsigned int>       indexes{};
+    
+    };
+
+    struct Mesh : public GTech::IdName {
+
+        enum class DataType {NONE, TEXCOORDS, NORMALS, VERTICES};
+        std::map<std::string, unsigned int> offsetMap{};
+        std::map<std::string, unsigned int> sizeMap{};
+        std::vector<float>                  floatVector{};
+        std::vector<GTech::TriangleArray>   triangleArray{};
+
     };
 
     struct Shader : public GTech::IdName{

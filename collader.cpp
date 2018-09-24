@@ -36,17 +36,13 @@ bool GTech::ColladaVisitor::VisitEnter_library_geometries(const tinyxml2::XMLEle
         aMesh = GTech::Mesh{};
         aMesh.SetIdName(pa);
 
-    } else if (eName == "source") {
-
-        auto attrMap = GetAttrMap(pa);
-
     } else if (eName == "float_array") {
 
         //Get Attr dict
         auto attrMap = GetAttrMap(pa);
 
-        const auto p = (XMLElement*)(e.Parent());
-        auto ppa = p->FirstAttribute();
+        //Get Parent dict
+        auto ppa = reinterpret_cast<const XMLElement*>(e.Parent())->FirstAttribute();
         auto attrMapParent = GetAttrMap(ppa);
 
         //Get id
@@ -77,21 +73,54 @@ bool GTech::ColladaVisitor::VisitEnter_library_geometries(const tinyxml2::XMLEle
 
     } else if (eName == "input") {
 
-        const auto p = (XMLElement*)(e.Parent());
+        const auto p = reinterpret_cast<const XMLElement*>(e.Parent());
         auto ppa = p->FirstAttribute();
-
         auto pName = std::string{p->Name()};
+
         auto attrMap = GetAttrMap(pa);
         auto attrMapParent = GetAttrMap(ppa);
-        auto pRealId = attrMap["source"].c_str();
-        pRealId++;
-        auto realId  = std::string{pRealId};
-        auto aliasId = attrMapParent["id"];
 
-        aMesh.sizeMap[aliasId] = aMesh.sizeMap[realId];
-        aMesh.offsetMap[aliasId] = aMesh.offsetMap[realId];
+        auto pSource = attrMap["source"].c_str();
+        auto source  = std::string{++pSource};
 
-    }
+        if (pName == "vertices") {
+        
+            auto aliasId = attrMapParent["id"];
+            aMesh.sizeMap[aliasId] = aMesh.sizeMap[source];
+            aMesh.offsetMap[aliasId] = aMesh.offsetMap[source];
+        
+        } else if (pName == "triangles") {
+
+            auto triangleArrayIndex     = aMesh.triangleArray.size();
+            auto& triangles             = aMesh.triangleArray[triangleArrayIndex];
+            
+            auto inputDataConfig        = GTech::InputDataConfig{};
+
+            auto semantic               = attrMap["semantic"];
+            if ( semantic == "TEXCOORD" )       inputDataConfig.dataType = GTech::InputDataConfig::DataType::TEXCOORDS;
+            else if ( semantic == "NORMAL" )    inputDataConfig.dataType = GTech::InputDataConfig::DataType::NORMALS;
+            else if ( semantic == "VERTICES" )  inputDataConfig.dataType = GTech::InputDataConfig::DataType::VERTICES;  
+            
+            auto pSourceId              = attrMap["source"].c_str();
+            inputDataConfig.sourceId    = std::string{++pSourceId};
+
+            auto offsetString           = std::stringstream{attrMap["offset"]};
+            offsetString >> inputDataConfig.offset;
+
+        } 
+
+    } else if (eName == "triangles") {
+
+        auto attrMap            = GetAttrMap(pa);
+        auto triangles          = GTech::TriangleArray{};
+        
+        auto countString        = std::stringstream{attrMap["count"]};
+        countString >> triangles.count;
+
+        triangles.materialId    = attrMap["material"];
+        aMesh.triangleArray.push_back(triangles);
+
+    } 
 
     return true;
 }
@@ -299,37 +328,6 @@ bool GTech::ColladaVisitor::VisitEnter(const XMLElement& e, const XMLAttribute* 
         aMesh = GTech::Mesh{};
         aMesh.SetIdName(pa);
 
-    } else if (eName == "param") {
-
-        aMesh.temporalStrideXYZ += pa->Value();
-        
-    } else if (eName == "accessor") {
-
-        aMesh.temporalStrideXYZ = std::string{};
-
-        auto paux = pa->Next();
-        auto countStrideStream = std::stringstream{std::string{paux->Value()} + std::string{" "} + std::string{paux->Next()->Value()}};
-        int count, stride; countStrideStream >> count; countStrideStream >> stride; int numelements = count * stride;
-
-        aMesh.temporalNextIndexToWrite = aScene.geometricalData.size();
-        aScene.geometricalData.resize(aMesh.temporalNextIndexToWrite + numelements);
-
-    } else if (eName == "source"){
-
-        std::vector<std::string> tokens {"-positions", "-normals", "-texcoords"};
-        auto sourceIdString = std::string{pa->Value()};
-        for (auto token : tokens){
-            if (aMesh.id + token == sourceIdString) {
-                if      ( token == tokens[0] )  aMesh.temporalDataType = GTech::Mesh::DataType::VERTICES;
-                else if ( token == tokens[1] )  aMesh.temporalDataType = GTech::Mesh::DataType::NORMALS;
-                else if ( token == tokens[2] )  aMesh.temporalDataType = GTech::Mesh::DataType::TEXCOORDS;
-            }
-        }
-
-    } else if (eName == "float_array") {
-
-        aMesh.temporalStringStream = std::stringstream{std::string{e.GetText()}};
-
     } 
 
     return true;
@@ -346,52 +344,6 @@ bool GTech::ColladaVisitor::VisitExit(const XMLElement& e){
     } else if (eName == "light"){
 
         aScene.lights[aLight.name] = aLight;
-
-    } else if (eName == "source"){
-
-        auto numelements    = aScene.geometricalData.size() - aMesh.temporalNextIndexToWrite;
-        auto keyPair        = std::make_pair(aMesh.temporalNextIndexToWrite, numelements);
-
-        if (aMesh.temporalDataType == GTech::Mesh::DataType::VERTICES) {
-
-            aMesh.vertices  = keyPair;
-
-        } else if (aMesh.temporalDataType == GTech::Mesh::DataType::NORMALS) {
-
-            aMesh.normals   = keyPair;
-
-        } else if (aMesh.temporalDataType == GTech::Mesh::DataType::TEXCOORDS) {
-
-            aMesh.texcoords = keyPair;
-
-        }
-
-        auto strideSize = aMesh.temporalStrideXYZ.length();
-        glm::vec3 fvector;
-
-        for (auto index = 0; index < numelements; ++index){
-
-            auto strideIndex = index % strideSize;
-
-            auto dimensionToken = aMesh.temporalStrideXYZ.data()[strideIndex];
-            if ( dimensionToken == 'X') {
-                aMesh.temporalStringStream >> fvector.x;
-            } else if (dimensionToken == 'Y') {
-                aMesh.temporalStringStream >> fvector.y;
-            } else if (dimensionToken == 'Z') {
-                aMesh.temporalStringStream >> fvector.z;
-            }
-
-            if (strideIndex == 2) {
-
-                if (aScene.z_up) std::swap(fvector.y, fvector.z);
-                auto pfloat = aScene.geometricalData.data();
-                pfloat [aMesh.temporalNextIndexToWrite++] = fvector.x;
-                pfloat [aMesh.temporalNextIndexToWrite++] = fvector.y;
-                pfloat [aMesh.temporalNextIndexToWrite++] = fvector.z;
-            }
-
-        }
 
     } else if (eName == "image") {
 
