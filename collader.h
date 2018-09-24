@@ -14,7 +14,7 @@ namespace GTech {
         std::string id;
         std::string name;
         glm::vec3 color;
-        virtual void setIdName(const tinyxml2::XMLAttribute* pa){
+        virtual void SetIdName(const tinyxml2::XMLAttribute *pa){
             assert(pa != nullptr);
             if (pa) id = pa->Value();
             auto next = pa->Next();
@@ -22,7 +22,11 @@ namespace GTech {
             if (next) name = next->Value();
         }
     };
+    struct Image : public IdName {
 
+        std::string path{};
+
+    };
     struct Camera : public GTech::IdName {
         enum class ProjectionType {ORTO, PERS};
         union {
@@ -51,6 +55,10 @@ namespace GTech {
     using IdxSz = std::pair<unsigned int, unsigned int >; //Index and sizes;
     struct Mesh : public GTech::IdName {
 
+        std::map<std::string, unsigned int> offsetMap{};
+        std::map<std::string, unsigned int> sizeMap{};
+        std::vector<float> floatVector;
+
         //PAIR INDEX , SIZE
         IdxSz vertices{std::make_pair(0,0)};
         IdxSz normals{std::make_pair(0,0)};
@@ -63,32 +71,26 @@ namespace GTech {
         unsigned int        temporalNextIndexToWrite{0};
     };
 
-    struct Material : public GTech::IdName{
+    struct Shader : public GTech::IdName{
 
 
     	enum class ShaderType {BLINN, CONSTANT, LAMBERT, PHONG};
-    	void setIdName(const tinyxml2::XMLAttribute* pa, std::string stringToStrip){
 
-    	    assert(pa);
-    	    if (pa) id = pa->Value();
-            auto stripIndex = id.find(stringToStrip);
-            name = id.substr(0, stripIndex);
-
-    	}
 
     	glm::vec4   			emission;
         glm::vec4   			ambient;
         glm::vec4   			diffuse;
         glm::vec4   			specular;
+        glm::vec4				reflective;
         float       			shininess;
-        Material::ShaderType	shaderType;
-        std::map<std::string, Material::ShaderType> shaderTypeMap {
-        	std::make_pair("blinn",		Material::ShaderType::BLINN),
-        	std::make_pair("constant",	Material::ShaderType::CONSTANT),
-        	std::make_pair("lambert",	Material::ShaderType::LAMBERT),
-        	std::make_pair("phong",		Material::ShaderType::PHONG)
-        	
-        };
+        float					refractionIndex;
+        Shader::ShaderType	    shaderType;
+        std::string             imageId{};
+    };
+
+    struct Material : public GTech::IdName {
+
+        GTech::Shader*          pShader{nullptr};
 
     };
 
@@ -101,8 +103,10 @@ namespace GTech {
         bool z_up{false};
         std::map<std::string, GTech::Camera> cameras{};
         std::map<std::string, GTech::Light> lights{};
-        std::map<std::string, GTech::Material> materials{};
+        std::map<std::string, GTech::Shader> shaders{};
         std::map<std::string, GTech::Mesh> meshes{};
+        std::map<std::string, GTech::Image> images{};
+        std::map<std::string, GTech::Material> materials{};
         std::vector<float> geometricalData{};
 
 
@@ -128,7 +132,13 @@ namespace GTech {
 	        scene
 	    };
 	private:
-	    std::map<std::string, ColladaVisitor::VisitorState > stateMap {
+    	
+        glm::vec4* tmpv4ptr{nullptr};
+    	float*     tmpfloatptr{nullptr};
+
+    	std::map<std::string, GTech::IdName*> nodePtrMap;
+
+        std::map<std::string, ColladaVisitor::VisitorState > stateMap {
 	        std::make_pair("none",                  ColladaVisitor::VisitorState::none),
 	    	std::make_pair("asset",					ColladaVisitor::VisitorState::asset),
 	        std::make_pair("library_cameras",		ColladaVisitor::VisitorState::library_cameras),
@@ -141,6 +151,12 @@ namespace GTech {
 	        std::make_pair("library_visual_scenes",	ColladaVisitor::VisitorState::library_visual_scenes),
 	        std::make_pair("scene",					ColladaVisitor::VisitorState::scene)
 	    };
+
+        bool VisitEnter_library_effects(const tinyxml2::XMLElement& e, const tinyxml2::XMLAttribute* pa);
+        bool VisitEnter_library_images(const tinyxml2::XMLElement& e, const tinyxml2::XMLAttribute* pa);
+        bool VisitEnter_library_materials(const tinyxml2::XMLElement& e, const tinyxml2::XMLAttribute* pa);
+        bool VisitEnter_library_geometries(const tinyxml2::XMLElement& e, const tinyxml2::XMLAttribute* pa);
+
 
 	public:
 	    VisitorState visitorState{VisitorState::none};
