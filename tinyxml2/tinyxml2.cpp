@@ -37,7 +37,7 @@ distribution.
 	/*int _snprintf_s(
 	   char *buffer,
 	   size_t sizeOfBuffer,
-	   size_t count,
+	   size_t pointsCount,
 	   const char *format [,
 		  argument] ...
 	);*/
@@ -1954,7 +1954,7 @@ bool XMLElement::ShallowEqual( const XMLNode* compare ) const
             b = b->Next();
         }
         if ( a || b ) {
-            // different count
+            // different pointsCount
             return false;
         }
         return true;

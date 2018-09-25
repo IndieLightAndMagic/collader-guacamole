@@ -1,3 +1,5 @@
+#ifndef __COLLADER_H__
+#define __COLLADER_H__
 #include "tinyxml2/tinyxml2.h"
 #include "glm/glm.hpp"
 
@@ -13,7 +15,6 @@ namespace GTech {
     struct IdName {
         std::string id;
         std::string name;
-        glm::vec3 color;
         virtual void SetIdName(const tinyxml2::XMLAttribute *pa){
             assert(pa != nullptr);
             if (pa) id = pa->Value();
@@ -30,9 +31,9 @@ namespace GTech {
     struct Camera : public GTech::IdName {
         enum class ProjectionType {ORTO, PERS};
         union {
-            float mag;
-            float fov;
-        }x;
+            float xmag;
+            float yfov;
+        }projection;
         float aspect_ratio{};
         float znear{0.1f};
         float zfar{100.0f};
@@ -52,35 +53,43 @@ namespace GTech {
 
     };
 
-    struct InputDataConfig {
+    struct MeshSource {
 
-        enum class DataType {NONE, TEXCOORDS, NORMALS, VERTICES};
-        GTech::InputDataConfig::DataType    dataType{InputDataConfig::DataType::NONE};
-        std::string                         sourceId{};
+        unsigned int    pointsCount{0};
+        unsigned int    stride{0};
+        std::string     axisOrder{};
+        unsigned int    index;
+        unsigned int    size;
+
+    };
+
+    struct MeshTrianglesInput {
+
+        enum class DataType {NONE, TEXCOORD, NORMAL, VERTEX};
+        GTech::MeshTrianglesInput::DataType	semantic{MeshTrianglesInput::DataType::NONE};
+        std::string                         source{};
         unsigned int                        offset{0};
     
     };
 
-    struct TriangleArray {
+    struct MeshTriangles {
         
         unsigned int                    count{0};
-        std::string                     materialId{};
-        std::vector<InputDataConfig>    indexArrayInputConfiguration{};
-        std::vector<unsigned int>       indexes{};
-    
+        std::string                     material{};
+        std::vector<MeshTrianglesInput> meshTrianglesInput;
+        std::vector<unsigned int>       indexArray;
+
     };
 
     struct Mesh : public GTech::IdName {
 
-        enum class DataType {NONE, TEXCOORDS, NORMALS, VERTICES};
-        std::map<std::string, unsigned int> offsetMap{};
-        std::map<std::string, unsigned int> sizeMap{};
-        std::vector<float>                  floatVector{};
-        std::vector<GTech::TriangleArray>   triangleArray{};
+        std::map<std::string, GTech::MeshSource>    meshSourceMap{};
+        std::vector<GTech::MeshTriangles>           triangleArray{};
+        std::vector<float>                          floatVector{};
 
     };
 
-    struct Shader : public GTech::IdName{
+    struct Effect : public GTech::IdName{
 
 
     	enum class ShaderType {BLINN, CONSTANT, LAMBERT, PHONG};
@@ -93,13 +102,22 @@ namespace GTech {
         glm::vec4				reflective;
         float       			shininess;
         float					refractionIndex;
-        Shader::ShaderType	    shaderType;
+        Effect::ShaderType	    shaderType;
         std::string             imageId{};
     };
 
     struct Material : public GTech::IdName {
 
-        GTech::Shader*          pShader{nullptr};
+        GTech::Effect*          pShader{nullptr};
+
+    };
+
+    struct Node : public GTech::IdName {
+
+        glm::mat4 transform;
+        std::string url{};
+        std::map<std::string, std::string> instanced_materials{};
+         
 
     };
 
@@ -110,9 +128,10 @@ namespace GTech {
         std::string modified;
 
         bool z_up{false};
+        std::map<std::string, GTech::Node> nodes{};
         std::map<std::string, GTech::Camera> cameras{};
         std::map<std::string, GTech::Light> lights{};
-        std::map<std::string, GTech::Shader> shaders{};
+        std::map<std::string, GTech::Effect> shaders{};
         std::map<std::string, GTech::Mesh> meshes{};
         std::map<std::string, GTech::Image> images{};
         std::map<std::string, GTech::Material> materials{};
@@ -165,6 +184,19 @@ namespace GTech {
         bool VisitEnter_library_images(const tinyxml2::XMLElement& e, const tinyxml2::XMLAttribute* pa);
         bool VisitEnter_library_materials(const tinyxml2::XMLElement& e, const tinyxml2::XMLAttribute* pa);
         bool VisitEnter_library_geometries(const tinyxml2::XMLElement& e, const tinyxml2::XMLAttribute* pa);
+        bool VisitEnter_library_cameras(const tinyxml2::XMLElement& e, const tinyxml2::XMLAttribute* pa);
+        bool VisitEnter_library_lights(const tinyxml2::XMLElement &e, const tinyxml2::XMLAttribute *pa);
+        bool VisitEnter_library_visual_scenes(const tinyxml2::XMLElement &e, const tinyxml2::XMLAttribute *pa);
+
+        bool VisitExit_library_geometries(const tinyxml2::XMLElement& e);
+        bool VisitExit_library_images(const tinyxml2::XMLElement& e);
+        bool VisitExit_library_cameras(const tinyxml2::XMLElement& e);
+        bool VisitExit_library_materials(const tinyxml2::XMLElement& e);
+        bool VisitExit_library_effects(const tinyxml2::XMLElement& e);
+        bool VisitExit_library_lights(const tinyxml2::XMLElement &e);
+        bool VisitExit_library_visual_scenes(const tinyxml2::XMLElement &e);
+
+
 
 
 	public:
@@ -173,5 +205,37 @@ namespace GTech {
 		bool VisitExit(const tinyxml2::XMLElement& e);
 	    	    
 
+    //Utils
+        using AttrMap = std::map<std::string, std::string>;
+        AttrMap GetAttrMap (const tinyxml2::XMLAttribute* pa){
+
+            auto attrMap = AttrMap{}; 
+            for (;pa; pa = pa->Next()){
+                attrMap[std::string{pa->Name()}] = std::string{pa->Value()};
+            }
+            return attrMap;
+        }
+        AttrMap GetAttrMapParent(const tinyxml2::XMLElement& e){
+
+            //Get Parent dict
+            auto ppa = reinterpret_cast<const tinyxml2::XMLElement*>(e.Parent())->FirstAttribute();
+            auto attrMapParent = GetAttrMap(ppa);
+
+            return attrMapParent;    
+
+        }
+
+        std::string GetParentName(const tinyxml2::XMLElement& e){
+
+            //Get Parent dict
+            return std::string{reinterpret_cast<const tinyxml2::XMLElement*>(e.Parent())->Name()};
+            
+        }
+
+
+
 	};
 }
+
+#endif
+
