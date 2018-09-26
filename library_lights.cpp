@@ -30,7 +30,7 @@ bool GTech::ColladaVisitor::VisitEnter_library_lights(const tinyxml2::XMLElement
 
     auto eName = std::string{e.Name()};
     auto attrMap = GetAttrMap(pa);
-    auto textString = std::stringstream{std::string{e.GetText()}};
+    auto textString = std::stringstream{GetElementText(e)};
 
     if (eName == "light"){
 

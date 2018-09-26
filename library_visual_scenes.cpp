@@ -31,7 +31,7 @@ bool GTech::ColladaVisitor::VisitEnter_library_visual_scenes(const tinyxml2::XML
 
 	auto eName = std::string{e.Name()};
 	auto attrMap = GetAttrMap(pa);
-	auto textString = std::stringstream{std::string{e.GetText()}};
+	auto textString = std::stringstream{GetElementText(e)};
 
 	if (eName == "visual_scene"){
 
@@ -57,7 +57,7 @@ bool GTech::ColladaVisitor::VisitEnter_library_visual_scenes(const tinyxml2::XML
 		
 		aNode.transform = glm::mat4{rows[0], rows[1], rows[2], rows[3]};
 
-	} else if (eName == "instance_camera" || eName == "instance_camera" || eName == "instance_geometry"){
+	} else if (eName == "instance_camera" || eName == "instance_light" || eName == "instance_geometry"){
 
 		auto pUrl = attrMap["url"].c_str() + 1;
 		aNode.url = std::string{pUrl};

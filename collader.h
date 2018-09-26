@@ -161,6 +161,17 @@ namespace GTech {
 	    };
 	private:
     	
+        GTech::Node aNode;
+        GTech::Mesh aMesh;
+        GTech::Scene aScene;
+        GTech::Light aLight;
+        GTech::Image anImage;
+        GTech::Camera aCamera;
+        GTech::Effect aShader;
+        GTech::Material aMaterial;
+        GTech::MeshSource aMeshSource;
+        GTech::MeshTriangles aMeshTriangles;
+
         glm::vec4* tmpv4ptr{nullptr};
     	float*     tmpfloatptr{nullptr};
 
@@ -225,15 +236,21 @@ namespace GTech {
 
         }
 
+        std::string GetElementText(const tinyxml2::XMLElement& e);
+
         std::string GetParentName(const tinyxml2::XMLElement& e){
 
             //Get Parent dict
             return std::string{reinterpret_cast<const tinyxml2::XMLElement*>(e.Parent())->Name()};
             
         }
+        
 
+        const Scene& GetScene(){
+            return aScene;
+        }
 
-
+        void PrintSceneInfo();
 	};
 }
 

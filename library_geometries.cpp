@@ -66,7 +66,7 @@ bool GTech::ColladaVisitor::VisitEnter_library_geometries(const tinyxml2::XMLEle
         auto newSize = aMesh.floatVector.size();
 
         //Parse the floats
-        auto theFloats = std::stringstream{e.GetText()};
+        auto theFloats = std::stringstream{GetElementText(e)};
         for (auto index = aMeshSource.index; index < newSize; index++){
 
             theFloats >> aMesh.floatVector[index];
@@ -76,7 +76,7 @@ bool GTech::ColladaVisitor::VisitEnter_library_geometries(const tinyxml2::XMLEle
     } else if (eName == "p" && parentName == "triangles") {
 
         auto size = aMeshTriangles.count * 3;
-        auto indexArrayStream = std::stringstream{std::string{e.GetText()}};
+        auto indexArrayStream = std::stringstream{GetElementText(e)};
         for (unsigned int pos; pos < size; ++pos){
             
             unsigned int index;

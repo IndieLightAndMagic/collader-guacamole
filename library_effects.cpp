@@ -62,7 +62,7 @@ bool GTech::ColladaVisitor::VisitEnter_library_effects(const XMLElement& e, cons
 
     } else if (eName == "color") {
 
-        auto colorText = std::stringstream{e.GetText()};
+        auto colorText = std::stringstream{GetElementText(e)};
         auto setRGBColor = [&](auto rgbVector){
 
             colorText >> rgbVector->r;
@@ -83,12 +83,12 @@ bool GTech::ColladaVisitor::VisitEnter_library_effects(const XMLElement& e, cons
 
     } else if (eName == "float") {
 
-        auto floatText = std::stringstream{e.GetText()};
+        auto floatText = std::stringstream{GetElementText(e)};
         floatText >> *tmpfloatptr;
         
     } else if (eName == "init_from") {
 
-        aShader.imageId = e.GetText();
+        aShader.imageId = GetElementText(e);
 
     }
 

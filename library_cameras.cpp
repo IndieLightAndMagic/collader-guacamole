@@ -13,7 +13,8 @@ extern GTech::Camera aCamera;
 bool GTech::ColladaVisitor::VisitEnter_library_cameras(const XMLElement& e, const XMLAttribute* pa){
 
     auto eName          = std::string {e.Name()};
-    auto pTextString    = std::stringstream{std::string{e.GetText()}};
+    auto pText          = GetElementText(e);
+    auto pTextString    = std::stringstream{pText};
     
     if (eName == "camera"){
 
@@ -22,11 +23,11 @@ bool GTech::ColladaVisitor::VisitEnter_library_cameras(const XMLElement& e, cons
 
     } else if (eName == "yfov") {
 
-        std::stringstream{std::string{e.GetText()}} >> aCamera.projection.yfov; 
+        pTextString >> aCamera.projection.yfov; 
     
     } else if (eName == "xmag") {
 
-        std::stringstream{std::string{e.GetText()}} >> aCamera.projection.xmag;
+        pTextString >> aCamera.projection.xmag;
 
     } else if (eName == "ortographic" || eName == "perspective") {
 

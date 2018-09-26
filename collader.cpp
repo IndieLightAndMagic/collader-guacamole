@@ -5,22 +5,48 @@
 using namespace tinyxml2;
 using namespace std;
 
+std::string GTech::ColladaVisitor::GetElementText(const XMLElement& e){
 
+    auto eText = e.GetText();
+    auto eTextString = (eText != nullptr) ? std::string{eText} : std::string{};
+    return eTextString;
 
-GTech::Node aNode;
-GTech::Mesh aMesh;
-GTech::Scene aScene;
-GTech::Light aLight;
-GTech::Image anImage;
-GTech::Camera aCamera;
-GTech::Effect aShader;
-GTech::Material aMaterial;
-GTech::MeshSource aMeshSource;
-GTech::MeshTriangles aMeshTriangles;
+}
 
+void GTech::ColladaVisitor::PrintSceneInfo(){
 
+    std::cout << "\n";
 
+    std::cout << "Exporting Tool: " << aScene.authoring_tool << std::endl;
+    std::cout << "Created By    : " << aScene.created << std::endl;
+    std::cout << "Modified      : " << aScene.modified << std::endl;
+    
+    /* List of nodes */
+    std::cout << "\nNODES:\n";
+    std::cout << "=====\n\n";
 
+    for (auto& nodename_thenode : aScene.nodes){
+
+        auto nodename   = nodename_thenode.first;
+        auto node       = nodename_thenode.second;
+        std::cout << "NAME: " << nodename << " URL: " << node.url << "\n";
+
+    }
+    
+    /* List of nodes */
+    std::cout << "\nNODE PTRS:\n";
+    std::cout << "=====\n\n";
+
+    for (auto& nodePtrName_nodePtr : nodePtrMap){
+
+        auto nodePtrName = nodePtrName_nodePtr.first;
+        auto nodePtr = nodePtrName_nodePtr.second;
+
+        std::cout << "NAME: " << nodePtrName << " Add: 0x" << std::hex << (unsigned long)nodePtr << "\n";
+
+    }
+
+}
 
 bool GTech::ColladaVisitor::VisitEnter(const XMLElement& e, const XMLAttribute* pa){
     
@@ -64,11 +90,19 @@ bool GTech::ColladaVisitor::VisitEnter(const XMLElement& e, const XMLAttribute* 
 
     } else if (eName == "authoring_tool") {
 
-        aScene.authoring_tool = e.GetText();
+        aScene.authoring_tool = GetElementText(e);
+
+    } else if (eName == "created") { 
+
+        aScene.created = GetElementText(e);
+
+    } else if (eName == "modified") { 
+
+        aScene.modified = GetElementText(e);
 
     } else if (eName == "up_axis") {
 
-        auto z_up = std::string{e.GetText()};
+        auto z_up = GetElementText(e);
         aScene.z_up = z_up == "Z_UP" ? true : false;
 
     } 
@@ -114,6 +148,8 @@ bool GTech::ColladaVisitor::VisitExit(const XMLElement& e){
     return true;
 }
 
+
+
 int main (){
 
 	XMLDocument doc;
@@ -122,6 +158,7 @@ int main (){
     GTech::ColladaVisitor visitor;
     auto pVisitor = &visitor;
     doc.Accept(pVisitor);
+    visitor.PrintSceneInfo();
 
 	return 0;
 }
