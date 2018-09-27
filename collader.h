@@ -1,7 +1,13 @@
 #ifndef __COLLADER_H__
 #define __COLLADER_H__
+
+
 #include "tinyxml2/tinyxml2.h"
 #include "glm/glm.hpp"
+
+#define GLM_ENABLE_EXPERIMENTAL
+#include "glm/gtx/string_cast.hpp"
+
 
 #include <cassert>
 #include <iostream>
@@ -9,6 +15,7 @@
 #include <sstream>
 #include <utility>
 #include <vector>
+
 namespace GTech {
 
 
@@ -21,6 +28,15 @@ namespace GTech {
             auto next = pa->Next();
             assert(next != nullptr);
             if (next) name = next->Value();
+        }
+        virtual void Print(unsigned char depth = 1){
+
+            auto tab = std::string(depth,'\t');
+
+            std::cout << "\n";
+            std::cout << tab << "id:  " << id << "\n";
+            std::cout << tab << "name:" << id << "\n";
+                
         }
     };
     struct Image : public IdName {
@@ -38,17 +54,46 @@ namespace GTech {
         float znear{0.1f};
         float zfar{100.0f};
         ProjectionType projectionType{ProjectionType::PERS};
+        void Print(unsigned char depth = 1){
 
+            auto tab = std::string(depth, '\t');
+
+            std::cout << "\n";
+            std::cout << tab << "Camera:\n";
+            IdName::Print(depth);
+            auto projectionTypeString = projectionType == ProjectionType::PERS ? std::string{"perspective yfov: "} : std::string{"ortographic xmag: "};
+            std::cout << tab << "Projection Type: " << projectionTypeString << projection.yfov << "\n";
+            std::cout << tab << "zrange [ " << zfar << ", " << znear << " ]\n";
+            
+        }
     };
 
     struct Light : public GTech::IdName {
-        enum class LightType {POINT};
-        float constant_attenuation{1.0f};
+
+        enum class LightType {POINT, SPOT, SUN};
+        float constant_attenuation{0.0f};
         float linear_attenuaton{0.0f};
-        float quadratic_attenuation{0.001111f};
+        float quadratic_attenuation{0.0f};
 
         glm::vec3 color{1.0f, 0.0f, 0.0f};
         LightType lightType{GTech::Light::LightType::POINT};
+
+        void Print(unsigned char depth = 1){
+
+            auto tab = std::string(depth, '\t');
+
+            std::cout << "" << std::endl;
+            std::cout << tab << "Light:" << std::endl;
+            IdName::Print(depth);
+            auto lightTypeString = (lightType == LightType::POINT) ? std::string{"Point"} : ( (lightType == LightType::SPOT) ? std::string{"Spot"} : std::string{"Sun"} );
+            std::cout << tab << "Light Type: " << lightTypeString << "" << std::endl;
+            std::cout << tab << "Attenuation: " << std::endl;
+            std::cout << tab << " K: " << constant_attenuation << "" << std::endl;
+            std::cout << tab << " L: " << linear_attenuaton << "" << std::endl;
+            std::cout << tab << " Q: " << quadratic_attenuation << "" << std::endl;
+            std::cout << tab << "Color: " << glm::to_string(color)<< "" << std::endl;
+            
+        }
 
 
     };
@@ -61,6 +106,17 @@ namespace GTech {
         unsigned int    index;
         unsigned int    size;
 
+        void Print(unsigned int depth = 1){
+
+            auto tab = std::string(depth, '\t');
+            std::cout << tab << "Points: " << pointsCount << std::endl;
+            std::cout << tab << "Stride: " << stride << std::endl;
+            std::cout << tab << "AxisOrder: " << stride << std::endl;
+            std::cout << tab << "Index: " << index << std::endl;
+            std::cout << tab << "Size: " << size  << std::endl;
+
+        }
+
     };
 
     struct MeshTrianglesInput {
@@ -69,6 +125,23 @@ namespace GTech {
         GTech::MeshTrianglesInput::DataType	semantic{MeshTrianglesInput::DataType::NONE};
         std::string                         source{};
         unsigned int                        offset{0};
+
+        void Print(unsigned int depth = 1) {
+
+            auto tab = std::string(depth, '\t');
+
+            std::map<MeshTrianglesInput::DataType, std::string> semanticstringMap{
+                std::make_pair(DataType::NONE, std::string{"NONE"}),
+                std::make_pair(DataType::TEXCOORD, std::string{"TEXCOORD"}),
+                std::make_pair(DataType::NORMAL, std::string{"NORMAL"}),
+                std::make_pair(DataType::VERTEX, std::string{"VERTEX"})
+            };
+            
+            std::cout << tab << "Semantic: " << semanticstringMap[semantic] << std::endl;
+            std::cout << tab << "Source: " << source << std::endl;
+            std::cout << tab << "Offset: " << offset << std::endl;
+
+        }
     
     };
 
@@ -79,6 +152,29 @@ namespace GTech {
         std::vector<MeshTrianglesInput> meshTrianglesInput;
         std::vector<unsigned int>       indexArray;
 
+        void Print(unsigned int depth = 1 ){
+
+            auto tab = std::string(depth, '\t');
+
+            std::cout << tab << "Count: " << count << std::endl;
+            std::cout << tab << "Material: " << material << std::endl;
+            std::cout << tab << "Triangles Inputs: " << std::endl;
+            
+            for (auto& meshTriangleInput : meshTrianglesInput){
+                meshTriangleInput.Print(depth+1);
+            }
+
+            std::cout << tab << "Indexes Array: ";
+            
+            for (auto& index: indexArray){
+
+                std::cout << index << ", ";  
+
+            }
+            std::cout << std::endl;
+
+        }
+
     };
 
     struct Mesh : public GTech::IdName {
@@ -86,6 +182,34 @@ namespace GTech {
         std::map<std::string, GTech::MeshSource>    meshSourceMap{};
         std::vector<GTech::MeshTriangles>           triangleArray{};
         std::vector<float>                          floatVector{};
+        void Print(unsigned char depth = 1){
+
+            auto tab = std::string(depth, '\t');
+            
+            std::cout << std::endl;
+            std::cout << tab << "Mesh: " << std::endl;
+            IdName::Print(depth);
+
+            for (auto& meshname_meshsource: meshSourceMap){
+
+                auto meshName   = meshname_meshsource.first;
+                auto meshSource = meshname_meshsource.second;
+
+                std::cout << tab << "Mesh Name: " << meshName << std::endl;  
+                meshSource.Print(depth+1);
+
+            }
+            std::cout << tab << "Triangle Arrays: " << std::endl;
+            for (auto &anArray : triangleArray){
+                anArray.Print(depth+1);
+            }
+            std::cout << tab << "Float Data: ";
+            for (auto &aFloat: floatVector){
+                std::cout << aFloat << ", ";
+            }            
+            std::cout << std::endl;
+
+        }
 
     };
 
@@ -104,6 +228,7 @@ namespace GTech {
         float					refractionIndex;
         Effect::ShaderType	    shaderType;
         std::string             imageId{};
+
     };
 
     struct Material : public GTech::IdName {
@@ -114,10 +239,10 @@ namespace GTech {
 
     struct Node : public GTech::IdName {
 
-        glm::mat4 transform;
-        std::string url{};
-        std::map<std::string, std::string> instanced_materials{};
-         
+        glm::mat4                           transform;
+        std::string                         url{};
+        std::map<std::string, std::string>  instanced_materials{};
+        std::string                         instanceType{};        
 
     };
 
@@ -206,9 +331,6 @@ namespace GTech {
         bool VisitExit_library_effects(const tinyxml2::XMLElement& e);
         bool VisitExit_library_lights(const tinyxml2::XMLElement &e);
         bool VisitExit_library_visual_scenes(const tinyxml2::XMLElement &e);
-
-
-
 
 	public:
 	    VisitorState visitorState{VisitorState::none};

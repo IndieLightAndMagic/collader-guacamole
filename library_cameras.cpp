@@ -57,8 +57,8 @@ bool GTech::ColladaVisitor::VisitExit_library_cameras(const XMLElement& e){
     
     if (eName == "camera") {
         
-        aScene.cameras[aCamera.name] = aCamera;
-
+        aScene.cameras[aCamera.name]    = aCamera;
+        nodePtrMap[aCamera.id]          = &aScene.cameras[aCamera.name];           
     }
 
     return true;

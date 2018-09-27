@@ -17,8 +17,9 @@ bool GTech::ColladaVisitor::VisitExit_library_geometries(const XMLElement& e){
     
     if (eName == "geometry") {
         
-        aScene.meshes[aMesh.name] = aMesh;
-
+        aScene.meshes[aMesh.name]   = aMesh;
+        nodePtrMap[aMesh.id]        = &aScene.meshes[aMesh.name];
+    
     }
 
     return true;

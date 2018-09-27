@@ -59,9 +59,10 @@ bool GTech::ColladaVisitor::VisitEnter_library_visual_scenes(const tinyxml2::XML
 
 	} else if (eName == "instance_camera" || eName == "instance_light" || eName == "instance_geometry"){
 
-		auto pUrl = attrMap["url"].c_str() + 1;
-		aNode.url = std::string{pUrl};
-
+		auto pUrl 			= attrMap["url"].c_str() + 1;
+		aNode.url 			= std::string{pUrl};
+		aNode.instanceType	= eName;
+		
 	}
 
 	return true;
