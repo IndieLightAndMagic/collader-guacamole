@@ -229,6 +229,20 @@ namespace GTech {
         Effect::ShaderType	    shaderType;
         std::string             imageId{};
 
+        void Print(unsigned int depth = 1 ){
+
+        	std::map<ShaderType, std::string>shaderTypeMap {
+        		make_pair(ShaderType::BLINN, "blinn"),
+        		make_pair(ShaderType::BLINN, "constant"),
+        		make_pair(ShaderType::BLINN, "lambert"),
+        		make_pair(ShaderType::BLINN, "phong"),
+        	};
+            auto shaderTypeString = shaderTypeMap[shaderType];
+            
+        	
+
+        }
+
     };
 
     struct Material : public GTech::IdName {
