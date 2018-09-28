@@ -221,7 +221,8 @@ namespace GTech {
 
         void Print(std::string tab = std::string{'\t'} ){
 
-
+            std::cout << std::endl;
+            std::cout << tab << "Effect:" << std::endl; 
 
         	std::map<ShaderType, std::string>shaderTypeMap {
         		std::make_pair(ShaderType::BLINN, "blinn"),
@@ -231,8 +232,14 @@ namespace GTech {
         	};
             auto shaderTypeString = shaderTypeMap[shaderType];
             
-            std::cout << 
-        	
+            std::cout << tab << "Image Id: " << imageId;
+            std::cout << tab << "ShaderType: " << shaderTypeString << std::endl;
+            std::cout << tab << "Emission: " << glm::to_string(emission) << std::endl;      
+            std::cout << tab << "Ambient: " << glm::to_string(ambient) << std::endl;      
+            std::cout << tab << "Diffuse: " << glm::to_string(diffuse) << std::endl;      
+            std::cout << tab << "Specular: " << glm::to_string(specular) << std::endl;
+            std::cout << tab << "Shininess: " << shininess << std::endl;
+            std::cout << tab << "Refraction Index: " << refractionIndex << std::endl;
 
         }
 
@@ -242,6 +249,17 @@ namespace GTech {
 
         GTech::Effect*          pShader{nullptr};
 
+        void Print(std::string tab = std::string{'\t'}){
+
+            std::cout << std::endl;
+            std::cout << "Material:" << std::endl;
+
+            IdName::Print(tab);
+            if (pShader){
+            	pShader->Print(tab);
+            }
+        }
+
     };
 
     struct Node : public GTech::IdName {
@@ -249,7 +267,16 @@ namespace GTech {
         glm::mat4                           transform;
         std::string                         url{};
         std::map<std::string, std::string>  instanced_materials{};
-        std::string                         instanceType{};        
+        std::string                         instanceType{};
+        
+        void Print(std::string tab = std::string{'\t'}){
+
+            std::cout << std::endl;
+            std::cout << "Node" << std::endl;
+            IdName::Print(tab);
+            std::cout << "Instance Type: " << instanceType;
+            
+        }        
 
     };
 
