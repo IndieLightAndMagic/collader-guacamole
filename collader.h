@@ -29,9 +29,7 @@ namespace GTech {
             assert(next != nullptr);
             if (next) name = next->Value();
         }
-        virtual void Print(unsigned char depth = 1){
-
-            auto tab = std::string(depth,'\t');
+        virtual void Print(std::string tab = std::string{'\t'}){
 
             std::cout << "\n";
             std::cout << tab << "id:  " << id << "\n";
@@ -54,13 +52,11 @@ namespace GTech {
         float znear{0.1f};
         float zfar{100.0f};
         ProjectionType projectionType{ProjectionType::PERS};
-        void Print(unsigned char depth = 1){
-
-            auto tab = std::string(depth, '\t');
+        void Print(std::string tab = std::string{'\t'}){
 
             std::cout << "\n";
             std::cout << tab << "Camera:\n";
-            IdName::Print(depth);
+            IdName::Print(tab);
             auto projectionTypeString = projectionType == ProjectionType::PERS ? std::string{"perspective yfov: "} : std::string{"ortographic xmag: "};
             std::cout << tab << "Projection Type: " << projectionTypeString << projection.yfov << "\n";
             std::cout << tab << "zrange [ " << zfar << ", " << znear << " ]\n";
@@ -78,13 +74,11 @@ namespace GTech {
         glm::vec3 color{1.0f, 0.0f, 0.0f};
         LightType lightType{GTech::Light::LightType::POINT};
 
-        void Print(unsigned char depth = 1){
-
-            auto tab = std::string(depth, '\t');
+        void Print(std::string tab = std::string{'\t'}){
 
             std::cout << "" << std::endl;
             std::cout << tab << "Light:" << std::endl;
-            IdName::Print(depth);
+            IdName::Print(tab);
             auto lightTypeString = (lightType == LightType::POINT) ? std::string{"Point"} : ( (lightType == LightType::SPOT) ? std::string{"Spot"} : std::string{"Sun"} );
             std::cout << tab << "Light Type: " << lightTypeString << "" << std::endl;
             std::cout << tab << "Attenuation: " << std::endl;
@@ -106,10 +100,8 @@ namespace GTech {
         unsigned int    index;
         unsigned int    size;
 
-        void Print(unsigned int depth = 1){
+        void Print(std::string tab = std::string{'\t'}){
 
-            auto tab = std::string(depth, '\t');
-            std::cout << tab << "Points: " << pointsCount << std::endl;
             std::cout << tab << "Stride: " << stride << std::endl;
             std::cout << tab << "AxisOrder: " << stride << std::endl;
             std::cout << tab << "Index: " << index << std::endl;
@@ -126,9 +118,7 @@ namespace GTech {
         std::string                         source{};
         unsigned int                        offset{0};
 
-        void Print(unsigned int depth = 1) {
-
-            auto tab = std::string(depth, '\t');
+        void Print(std::string tab = std::string{'\t'}) {
 
             std::map<MeshTrianglesInput::DataType, std::string> semanticstringMap{
                 std::make_pair(DataType::NONE, std::string{"NONE"}),
@@ -152,16 +142,14 @@ namespace GTech {
         std::vector<MeshTrianglesInput> meshTrianglesInput;
         std::vector<unsigned int>       indexArray;
 
-        void Print(unsigned int depth = 1 ){
-
-            auto tab = std::string(depth, '\t');
+        void Print(std::string tab = std::string{'\t'} ){
 
             std::cout << tab << "Count: " << count << std::endl;
             std::cout << tab << "Material: " << material << std::endl;
             std::cout << tab << "Triangles Inputs: " << std::endl;
             
             for (auto& meshTriangleInput : meshTrianglesInput){
-                meshTriangleInput.Print(depth+1);
+                meshTriangleInput.Print(tab+'\t');
             }
 
             std::cout << tab << "Indexes Array: ";
@@ -182,13 +170,12 @@ namespace GTech {
         std::map<std::string, GTech::MeshSource>    meshSourceMap{};
         std::vector<GTech::MeshTriangles>           triangleArray{};
         std::vector<float>                          floatVector{};
-        void Print(unsigned char depth = 1){
+        
+        void Print(std::string tab = std::string{'\t'}){
 
-            auto tab = std::string(depth, '\t');
-            
             std::cout << std::endl;
             std::cout << tab << "Mesh: " << std::endl;
-            IdName::Print(depth);
+            IdName::Print(tab);
 
             for (auto& meshname_meshsource: meshSourceMap){
 
@@ -196,17 +183,20 @@ namespace GTech {
                 auto meshSource = meshname_meshsource.second;
 
                 std::cout << tab << "Mesh Name: " << meshName << std::endl;  
-                meshSource.Print(depth+1);
+                meshSource.Print(tab+'\t');
 
             }
+            
             std::cout << tab << "Triangle Arrays: " << std::endl;
             for (auto &anArray : triangleArray){
-                anArray.Print(depth+1);
+                anArray.Print(tab+'\t');
             }
+            
             std::cout << tab << "Float Data: ";
             for (auto &aFloat: floatVector){
                 std::cout << aFloat << ", ";
             }            
+            
             std::cout << std::endl;
 
         }
@@ -229,16 +219,19 @@ namespace GTech {
         Effect::ShaderType	    shaderType;
         std::string             imageId{};
 
-        void Print(unsigned int depth = 1 ){
+        void Print(std::string tab = std::string{'\t'} ){
+
+
 
         	std::map<ShaderType, std::string>shaderTypeMap {
-        		make_pair(ShaderType::BLINN, "blinn"),
-        		make_pair(ShaderType::BLINN, "constant"),
-        		make_pair(ShaderType::BLINN, "lambert"),
-        		make_pair(ShaderType::BLINN, "phong"),
+        		std::make_pair(ShaderType::BLINN, "blinn"),
+        		std::make_pair(ShaderType::CONSTANT, "constant"),
+        		std::make_pair(ShaderType::LAMBERT, "lambert"),
+        		std::make_pair(ShaderType::PHONG, "phong"),
         	};
             auto shaderTypeString = shaderTypeMap[shaderType];
             
+            std::cout << 
         	
 
         }
