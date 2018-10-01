@@ -15,9 +15,7 @@ std::string GTech::ColladaVisitor::GetElementText(const XMLElement& e){
 
 void GTech::ColladaVisitor::PrintSceneInfo(){
 
-    
-    
-    
+    aScene.Print();
 
 }
 

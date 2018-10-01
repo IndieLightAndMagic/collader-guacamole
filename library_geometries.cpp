@@ -13,6 +13,9 @@ bool GTech::ColladaVisitor::VisitExit_library_geometries(const XMLElement& e){
         aScene.meshes[aMesh.name]   = aMesh;
         aScene.nodePtrMap[aMesh.id] = &aScene.meshes[aMesh.name];
     
+    } else if (eName == "triangles") {
+
+        aMesh.triangleArray.push_back(aMeshTriangles);
     }
 
     return true;
@@ -67,11 +70,11 @@ bool GTech::ColladaVisitor::VisitEnter_library_geometries(const tinyxml2::XMLEle
 
         }
 
-    } else if (eName == "p" && parentName == "triangles") {
+    } else if (eName == "p") {
 
         auto size = aMeshTriangles.count * 3;
         auto indexArrayStream = std::stringstream{GetElementText(e)};
-        for (unsigned int pos; pos < size; ++pos){
+        for (unsigned int pos = 0; pos < size; ++pos){
             
             unsigned int index;
             indexArrayStream >> index;
@@ -81,20 +84,15 @@ bool GTech::ColladaVisitor::VisitEnter_library_geometries(const tinyxml2::XMLEle
 
     } else if (eName == "input") {
 
-        auto semanticMap = std::map<std::string, GTech::MeshTrianglesInput::DataType>{
-            std::make_pair("VERTEX", GTech::MeshTrianglesInput::DataType::VERTEX),
-            std::make_pair("NORMAL", GTech::MeshTrianglesInput::DataType::NORMAL),
-            std::make_pair("TEXCOORD", GTech::MeshTrianglesInput::DataType::TEXCOORD)
-        };             
-
         auto aMeshTriangleInput                 = GTech::MeshTrianglesInput{};
         aMeshTriangleInput.source               = std::string{attrMap["source"].c_str() + 1};
-        aMeshTriangleInput.semantic             = semanticMap[attrMap["semantic"]];
+        aMeshTriangleInput.semanticType             = aMeshTriangleInput.semanticTypeMap[attrMap["semantic"]];
         std::stringstream{attrMap["offset"]}    >> aMeshTriangleInput.source;
         aMeshTriangles.meshTrianglesInput.push_back(aMeshTriangleInput); 
 
     } else if (eName == "triangles") {
 
+        aMeshTriangles                          = GTech::MeshTriangles{};
         std::stringstream{attrMap["count"]}     >> aMeshTriangles.count;
         std::stringstream{attrMap["material"]}  >> aMeshTriangles.material;
 

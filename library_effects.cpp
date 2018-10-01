@@ -37,10 +37,11 @@ bool GTech::ColladaVisitor::VisitEnter_library_effects(const XMLElement& e, cons
     } else if (eName == "color") {
 
         auto ptr = aShader.colorpropertiesmap[parentName];
-        std::stringstream{std::string{eText}} >> ptr->r;
-        std::stringstream{std::string{eText}} >> ptr->g;
-        std::stringstream{std::string{eText}} >> ptr->b;
-        std::stringstream{std::string{eText}} >> ptr->a;
+        auto colorVectorText = std::stringstream{std::string{eText}};
+        colorVectorText >> ptr->r;
+        colorVectorText >> ptr->g;
+        colorVectorText >> ptr->b;
+        colorVectorText >> ptr->a;
 
     } else if (aShader.shadertypemap.find(eName) != aShader.shadertypemap.end()) {
 

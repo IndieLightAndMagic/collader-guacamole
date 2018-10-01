@@ -57,7 +57,14 @@ bool GTech::ColladaVisitor::VisitEnter_library_visual_scenes(const tinyxml2::XML
 		aNode.url 		= std::string{pUrl};
 		aNode.nodeType 	= aNode.nodeTypeMap[eName];
 
-	}
+	} else if (eName == "instance_material") {
+
+		auto insmat_key	= attrMap["symbol"];
+		auto insmat_val	= std::string{attrMap["target"].c_str() + 1};
+
+		aNode.instanced_materials[insmat_key] = insmat_val;
+
+	} 
 
 	return true;
 }

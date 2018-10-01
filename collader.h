@@ -33,16 +33,26 @@ namespace GTech {
 
             std::cout << "\n";
             std::cout << tab << "id:  " << id << "\n";
-            std::cout << tab << "name:" << id << "\n";
+            std::cout << tab << "name:" << name << "\n";
                 
         }
     };
+    
     struct Image : public IdName {
 
         std::string path{};
+        void Print(std::string tab = std::string{'\t'}){
 
+            std::cout << std::endl;
+            std::cout << tab << "Image:\n";
+            IdName::Print(tab);
+            std::cout << "\t" << "Image Path: " << path << std::endl;
+
+        }
     };
+    
     struct Camera : public GTech::IdName {
+        
         enum class ProjectionType {ORTO, PERS};
         union {
             float xmag;
@@ -52,6 +62,7 @@ namespace GTech {
         float znear{0.1f};
         float zfar{100.0f};
         ProjectionType projectionType{ProjectionType::PERS};
+        
         void Print(std::string tab = std::string{'\t'}){
 
             std::cout << "\n";
@@ -88,8 +99,6 @@ namespace GTech {
             std::cout << tab << "Color: " << glm::to_string(color)<< "" << std::endl;
             
         }
-
-
     };
 
     struct MeshSource {
@@ -108,15 +117,20 @@ namespace GTech {
             std::cout << tab << "Size: " << size  << std::endl;
 
         }
-
     };
 
     struct MeshTrianglesInput {
 
         enum class DataType {NONE, TEXCOORD, NORMAL, VERTEX};
-        GTech::MeshTrianglesInput::DataType	semantic{MeshTrianglesInput::DataType::NONE};
+        GTech::MeshTrianglesInput::DataType	semanticType{MeshTrianglesInput::DataType::NONE};
         std::string                         source{};
         unsigned int                        offset{0};
+        
+        std::map<std::string, GTech::MeshTrianglesInput::DataType> semanticTypeMap{
+            std::make_pair("VERTEX", GTech::MeshTrianglesInput::DataType::VERTEX),
+            std::make_pair("NORMAL", GTech::MeshTrianglesInput::DataType::NORMAL),
+            std::make_pair("TEXCOORD", GTech::MeshTrianglesInput::DataType::TEXCOORD)
+        };             
 
         void Print(std::string tab = std::string{'\t'}) {
 
@@ -126,13 +140,13 @@ namespace GTech {
                 std::make_pair(DataType::NORMAL, std::string{"NORMAL"}),
                 std::make_pair(DataType::VERTEX, std::string{"VERTEX"})
             };
-            
-            std::cout << tab << "Semantic: " << semanticstringMap[semantic] << std::endl;
-            std::cout << tab << "Source: " << source << std::endl;
-            std::cout << tab << "Offset: " << offset << std::endl;
+
+        
+            std::cout << tab << "Semantic: " << semanticstringMap[semanticType];
+            std::cout << " Source: " << source;
+            std::cout << " Offset: " << std::endl;
 
         }
-    
     };
 
     struct MeshTriangles {
@@ -152,17 +166,21 @@ namespace GTech {
                 meshTriangleInput.Print(tab+'\t');
             }
 
-            std::cout << tab << "Indexes Array: ";
             
+            auto indexArraySize = indexArray.size();
+            std::cout << tab << "Index Array Count: " << indexArraySize << " Indexes Array: "<< std::endl;
+            
+            static unsigned int indexCount = 0;
             for (auto& index: indexArray){
-
-                std::cout << index << ", ";  
+                
+                if (!indexCount) std::cout << tab; std::cout << index; if (indexCount < (indexArraySize - 1)) std::cout <<", ";  
+                indexCount++;
 
             }
+            indexCount = 0;
             std::cout << std::endl;
 
         }
-
     };
 
     struct Mesh : public GTech::IdName {
@@ -191,15 +209,27 @@ namespace GTech {
             for (auto &anArray : triangleArray){
                 anArray.Print(tab+'\t');
             }
-            
+
             std::cout << tab << "Float Data: ";
+
+            static unsigned int strideCount = 0;
             for (auto &aFloat: floatVector){
-                std::cout << aFloat << ", ";
+
+                
+                if (strideCount%3 == 0)
+                    std::cout << std::endl << tab << "[" << strideCount / 3 << "]";
+
+                std::cout << " " << aFloat;
+
+                if (strideCount%3 <  2)
+                    std::cout << ",";
+
+                strideCount++;
+
             }            
-            
+            strideCount = 0;
             std::cout << std::endl;
         }
-
     };
 
     struct Effect : public GTech::IdName{
@@ -239,8 +269,10 @@ namespace GTech {
         void Print(std::string tab = std::string{'\t'} ){
 
             std::cout << std::endl;
-            std::cout << tab << "Effect:" << std::endl; 
+            std::cout << tab << "Effect:" << std::endl;
+            tab = tab + '\t';
 
+            IdName::Print(tab);
         	std::map<ShaderType, std::string>shaderTypeMap {
         		std::make_pair(ShaderType::BLINN, "blinn"),
         		std::make_pair(ShaderType::CONSTANT, "constant"),
@@ -249,7 +281,7 @@ namespace GTech {
         	};
             auto shaderTypeString = shaderTypeMap[shaderType];
             
-            std::cout << tab << "Image Id: " << imageId;
+            std::cout << tab << "Image Id: " << imageId << std::endl;
             std::cout << tab << "ShaderType: " << shaderTypeString << std::endl;
             std::cout << tab << "Emission: " << glm::to_string(emission) << std::endl;      
             std::cout << tab << "Ambient: " << glm::to_string(ambient) << std::endl;      
@@ -259,7 +291,6 @@ namespace GTech {
             std::cout << tab << "Refraction Index: " << refractionIndex << std::endl;
 
         }
-
     };
 
     struct Material : public GTech::IdName {
@@ -270,11 +301,9 @@ namespace GTech {
 
             std::cout << std::endl;
             std::cout << tab << "Material: " << std::endl;
-            IdName::Print(tab);
-            std::cout << tab << "Effect Id: " << effectUrl;
+            IdName::Print(tab + '\t');
 
         }
-
     };
 
     struct Node : public GTech::IdName {
@@ -293,7 +322,7 @@ namespace GTech {
         void Print(std::string tab = std::string{'\t'}){
 
             std::cout << std::endl;
-            std::cout << "Node" << std::endl;
+            std::cout << tab << "Node" << std::endl;
             IdName::Print(tab);
             for (auto&key_value : nodeTypeMap){
                 auto key    = key_value.first;
@@ -319,7 +348,6 @@ namespace GTech {
             std::cout << tab << glm::to_string(transform) << std::endl;
 
         }        
-
     };
 
     struct Scene : public GTech::IdName {
@@ -355,6 +383,26 @@ namespace GTech {
     
             std::cout << "\n";
             IdName::Print(tab);
+            for (auto& materialname_material : materials){
+                
+                auto material   = materialname_material.second;
+                material.Print(tab + '\t');
+                
+                auto effectUrl  = material.effectUrl;
+                if (!effectUrl.empty()){
+                
+                    auto effect     = dynamic_cast<GTech::Effect*>(nodePtrMap[effectUrl]);
+                    effect->Print(tab + '\t' + '\t');
+                    
+                    auto imageUrl   = effect->imageId;
+                    if (!imageUrl.empty()) {
+
+                        auto image  = dynamic_cast<GTech::Image*>(nodePtrMap[imageUrl]);
+                        image->Print(tab + '\t' + '\t' + '\t');
+                    
+                    }
+                }
+            }
             tab = tab + '\t';
             for (auto& nodename_node : nodes){
                 
@@ -381,7 +429,10 @@ namespace GTech {
 
             }
 
+            
+
         }
+
 
 
     };
@@ -417,10 +468,6 @@ namespace GTech {
         GTech::Material aMaterial;
         GTech::MeshSource aMeshSource;
         GTech::MeshTriangles aMeshTriangles;
-
-        glm::vec4* tmpv4ptr{nullptr};
-    	float*     tmpfloatptr{nullptr};
-
 
         std::map<std::string, ColladaVisitor::VisitorState > stateMap {
 	        std::make_pair("none",                  ColladaVisitor::VisitorState::none),
