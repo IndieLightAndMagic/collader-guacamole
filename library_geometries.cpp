@@ -1,15 +1,8 @@
 //http://www.wazim.com/Collada_Tutorial_1.htm
 #include "collader.h"
 
-extern GTech::Scene aScene;
-extern GTech::Mesh aMesh;
-extern GTech::MeshSource aMeshSource;
-extern GTech::MeshTriangles aMeshTriangles;
-
-
 using namespace tinyxml2;
 using namespace std;
-
 
 bool GTech::ColladaVisitor::VisitExit_library_geometries(const XMLElement& e){
 
@@ -18,7 +11,7 @@ bool GTech::ColladaVisitor::VisitExit_library_geometries(const XMLElement& e){
     if (eName == "geometry") {
         
         aScene.meshes[aMesh.name]   = aMesh;
-        nodePtrMap[aMesh.id]        = &aScene.meshes[aMesh.name];
+        aScene.nodePtrMap[aMesh.id] = &aScene.meshes[aMesh.name];
     
     }
 

@@ -5,12 +5,6 @@
 using namespace tinyxml2;
 using namespace std;
 
-
-
-extern GTech::Node aNode;
-extern GTech::Scene aScene;
-
-
 bool GTech::ColladaVisitor::VisitExit_library_visual_scenes(const tinyxml2::XMLElement &e){
 
 
@@ -21,8 +15,8 @@ bool GTech::ColladaVisitor::VisitExit_library_visual_scenes(const tinyxml2::XMLE
 
 	} else if (eName == "node"){
 
-		aScene.nodes[aNode.name] = aNode;
-		nodePtrMap[aNode.id] = &aScene.nodes[aNode.name];
+		aScene.nodes[aNode.name] 	= aNode;
+		aScene.nodePtrMap[aNode.id]	= &aScene.nodes[aNode.name];
 
 	}
 	return true;
@@ -57,12 +51,12 @@ bool GTech::ColladaVisitor::VisitEnter_library_visual_scenes(const tinyxml2::XML
 		
 		aNode.transform = glm::mat4{rows[0], rows[1], rows[2], rows[3]};
 
-	} else if (eName == "instance_camera" || eName == "instance_light" || eName == "instance_geometry"){
+	} else if (aNode.nodeTypeMap.find(eName) != aNode.nodeTypeMap.end()){
 
-		auto pUrl 			= attrMap["url"].c_str() + 1;
-		aNode.url 			= std::string{pUrl};
-		aNode.instanceType	= eName;
-		
+		auto pUrl 		= attrMap["url"].c_str() + 1;
+		aNode.url 		= std::string{pUrl};
+		aNode.nodeType 	= aNode.nodeTypeMap[eName];
+
 	}
 
 	return true;

@@ -5,22 +5,14 @@
 using namespace tinyxml2;
 using namespace std;
 
-
-
-
-extern GTech::Scene aScene;
-extern GTech::Light aLight;
-
-
-
 bool GTech::ColladaVisitor::VisitExit_library_lights(const tinyxml2::XMLElement &e){
 
     auto eName = std::string{e.Name()};
 
     if (eName == "light"){
 
-        aScene.lights[aLight.name]  = aLight;
-        nodePtrMap[aLight.id]       = &aScene.lights[aLight.name];
+        aScene.lights[aLight.name]      = aLight;
+        aScene.nodePtrMap[aLight.id]    = &aScene.lights[aLight.name];
 
     } 
     return true;

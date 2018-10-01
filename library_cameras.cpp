@@ -5,11 +5,6 @@
 using namespace tinyxml2;
 using namespace std;
 
-
-extern GTech::Scene aScene;
-extern GTech::Camera aCamera;
-
-
 bool GTech::ColladaVisitor::VisitEnter_library_cameras(const XMLElement& e, const XMLAttribute* pa){
 
     auto eName          = std::string {e.Name()};
@@ -58,7 +53,8 @@ bool GTech::ColladaVisitor::VisitExit_library_cameras(const XMLElement& e){
     if (eName == "camera") {
         
         aScene.cameras[aCamera.name]    = aCamera;
-        nodePtrMap[aCamera.id]          = &aScene.cameras[aCamera.name];           
+        aScene.nodePtrMap[aCamera.id]   = &aScene.cameras[aCamera.name];           
+    
     }
 
     return true;

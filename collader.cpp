@@ -15,49 +15,9 @@ std::string GTech::ColladaVisitor::GetElementText(const XMLElement& e){
 
 void GTech::ColladaVisitor::PrintSceneInfo(){
 
-    std::cout << "\n";
-
-    std::cout << "Exporting Tool: " << aScene.authoring_tool << std::endl;
-    std::cout << "Created By    : " << aScene.created << std::endl;
-    std::cout << "Modified      : " << aScene.modified << std::endl;
     
     
-    /* List of nodes */
-    std::cout << "\nNODE PTRS:\n";
-    std::cout << "=====\n\n";
-
-    for (auto& nodePtrName_nodePtr : nodePtrMap){
-
-        auto nodePtrName = nodePtrName_nodePtr.first;
-        auto nodePtr = nodePtrName_nodePtr.second;
-
-        std::cout << "NAME: " << nodePtrName << " Add: 0x" << std::hex << (unsigned long)nodePtr << "\n";
-
-    }
-
-    /* List of nodes */
-    std::cout << "\nNODES:\n";
-    std::cout << "=====\n\n";
     
-    for (auto& nodename_thenode : aScene.nodes){
-
-        auto nodename   = nodename_thenode.first;
-        auto node       = nodename_thenode.second;
-        auto nodePtr    = nodePtrMap[node.url];
-        std::cout << "Instance: " << node.instanceType << " NAME: " << nodename << " URL: " << node.url << ": 0x" << std::hex << (unsigned long)nodePtr << " \n";
-        if (node.instanceType == "instance_camera"){
-            auto cameraNode = dynamic_cast<GTech::Camera*>(nodePtr);
-            cameraNode->Print();
-        } else if (node.instanceType == "instance_light"){
-            auto lightNode = dynamic_cast<GTech::Light*>(nodePtr);
-            lightNode->Print();
-        }
-    }
-    
-    
-
-    /* Print the tree */
-
 
 }
 
