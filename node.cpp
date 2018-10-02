@@ -1,3 +1,3 @@
-#include "light.h"
+#include "node.h"
 
 using namespace GTech;

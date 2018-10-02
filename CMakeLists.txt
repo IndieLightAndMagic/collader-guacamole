@@ -20,21 +20,32 @@ set(GLM_DIR "${ROOT_DIR}/../GLM")
 
 add_executable(${TARGET_NAME} 
 
-	collader.h 
-	collader.cpp 
-	library_visual_scenes.cpp 
-	library_lights.cpp 
-	library_cameras.cpp 
-	library_materials.cpp 
-	library_effects.cpp 
-	library_geometries.cpp 
-	library_images.cpp 
-	tinyxml2/tinyxml2.cpp 
-	tinyxml2/tinyxml2.h
-	idname.h 
-	idname.cpp
-	camera.h 
-	camera.cpp 
-	
+    collader.h 
+    collader.cpp 
+    library_visual_scenes.cpp 
+    library_lights.cpp 
+    library_cameras.cpp 
+    library_materials.cpp 
+    library_effects.cpp 
+    library_geometries.cpp 
+    library_images.cpp 
+    tinyxml2/tinyxml2.cpp 
+    tinyxml2/tinyxml2.h
+    idname.h 
+    idname.cpp
+    camera.h 
+    camera.cpp 
+    light.h
+    light.cpp
+    mesh.h
+    mesh.cpp
+    effect.h
+    effect.cpp
+    material.h
+    material.cpp    
+    node.h
+    node.cpp
+    scene.h
+    scene.cpp
 )
 target_include_directories(${TARGET_NAME} PUBLIC ${GLM_DIR})

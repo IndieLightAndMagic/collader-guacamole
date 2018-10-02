@@ -5,16 +5,10 @@
 using namespace tinyxml2;
 using namespace std;
 
+std::shared_ptr<GTech::Light> pLightTmp = nullptr;
+
 bool GTech::ColladaVisitor::VisitExit_library_lights(const tinyxml2::XMLElement &e){
 
-    auto eName = std::string{e.Name()};
-
-    if (eName == "light"){
-
-        aScene.lights[aLight.name]      = aLight;
-        aScene.nodePtrMap[aLight.id]    = &aScene.lights[aLight.name];
-
-    } 
     return true;
 }
 
@@ -26,18 +20,18 @@ bool GTech::ColladaVisitor::VisitEnter_library_lights(const tinyxml2::XMLElement
 
     if (eName == "light"){
 
-        aLight = GTech::Light{};
-        aLight.SetIdName(pa);
+        pLightTmp                       = CreateElement<GTech::Light>(pa);
+        aScene.lights[pLightTmp->name]  = pLightTmp;
 
     } else if (eName == "color") {
 
-        textString >> aLight.color.r;
-        textString >> aLight.color.g;
-        textString >> aLight.color.b;
+        textString >> pLightTmp->color.r;
+        textString >> pLightTmp->color.g;
+        textString >> pLightTmp->color.b;
 
     } else if (eName == "linear_attenuation") {
 
-        textString >> aLight.linear_attenuaton;
+        textString >> pLightTmp->linear_attenuaton;
 
     }
     

@@ -1,3 +1,3 @@
-#include "light.h"
+#include "mesh.h"
 
 using namespace GTech;

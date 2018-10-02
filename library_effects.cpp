@@ -5,16 +5,10 @@
 using namespace tinyxml2;
 using namespace std;
 
+
+std::shared_ptr<GTech::Effect> pShaderTmp = nullptr;
 bool GTech::ColladaVisitor::VisitExit_library_effects(const XMLElement& e){
 
-    auto eName = std::string{e.Name()};
-
-    if (eName == "effect") {
-
-        aScene.shaders[aShader.name]    = aShader;
-        aScene.nodePtrMap[aShader.id]   = &aScene.shaders[aShader.name];
-
-    } 
     return true;
 
 }
@@ -26,8 +20,8 @@ bool GTech::ColladaVisitor::VisitEnter_library_effects(const XMLElement& e, cons
 
     if (eName == "effect") {
 
-        aShader = GTech::Effect{};
-        aShader.SetIdName(pa);
+        pShaderTmp                          = CreateElement<GTech::Effect>(pa);
+        aScene.shaders[pShaderTmp->name]    = pShaderTmp; 
         
     } else if (eName == "float") {
 
@@ -36,11 +30,11 @@ bool GTech::ColladaVisitor::VisitEnter_library_effects(const XMLElement& e, cons
 
         if (parentName == "shininess"){
 
-            aShader.shininess = property;
+            pShaderTmp->shininess = property;
 
         } else if (parentName == "index_of_refraction"){
 
-            aShader.refractionIndex = property;
+            pShaderTmp->refractionIndex = property;
 
         }
 
@@ -56,30 +50,30 @@ bool GTech::ColladaVisitor::VisitEnter_library_effects(const XMLElement& e, cons
 
         if (parentName == "emission") {
 
-            aShader.emission = colorVector;
+            pShaderTmp->emission = colorVector;
 
         } else if (parentName == "diffuse") {
 
-            aShader.diffuse = colorVector;
+            pShaderTmp->diffuse = colorVector;
 
         } else if (parentName == "ambient") {
 
-            aShader.ambient = colorVector;
+            pShaderTmp->ambient = colorVector;
 
         } else if (parentName =="specular") {
 
-            aShader.specular = colorVector;
+            pShaderTmp->specular = colorVector;
 
         } else if (parentName == "reflective") {
 
-            aShader.reflective = colorVector;
+            pShaderTmp->reflective = colorVector;
 
         }
 
 
-    } else if (aShader.shadertypemap.find(eName) != aShader.shadertypemap.end()) {
+    } else if (pShaderTmp->shadertypemap.find(eName) != pShaderTmp->shadertypemap.end()) {
 
-        aShader.shaderType = aShader.shadertypemap[eName];
+        pShaderTmp->shaderType = pShaderTmp->shadertypemap[eName];
 
     }
 
