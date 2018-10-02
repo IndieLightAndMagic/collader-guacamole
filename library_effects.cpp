@@ -31,17 +31,51 @@ bool GTech::ColladaVisitor::VisitEnter_library_effects(const XMLElement& e, cons
         
     } else if (eName == "float") {
 
-        auto ptr = aShader.floatpropertiesmap[parentName];
-        std::stringstream{std::string{eText}} >> *ptr;
+        float property;
+        std::stringstream{std::string{eText}} >> property;
+
+        if (parentName == "shininess"){
+
+            aShader.shininess = property;
+
+        } else if (parentName == "index_of_refraction"){
+
+            aShader.refractionIndex = property;
+
+        }
 
     } else if (eName == "color") {
 
-        auto ptr = aShader.colorpropertiesmap[parentName];
-        auto colorVectorText = std::stringstream{std::string{eText}};
-        colorVectorText >> ptr->r;
-        colorVectorText >> ptr->g;
-        colorVectorText >> ptr->b;
-        colorVectorText >> ptr->a;
+        auto colorVectorText    = std::stringstream{std::string{eText}};
+        auto colorVector        = glm::vec4{};
+
+        colorVectorText >> colorVector.r;
+        colorVectorText >> colorVector.g;
+        colorVectorText >> colorVector.b;
+        colorVectorText >> colorVector.a;
+
+        if (parentName == "emission") {
+
+            aShader.emission = colorVector;
+
+        } else if (parentName == "diffuse") {
+
+            aShader.diffuse = colorVector;
+
+        } else if (parentName == "ambient") {
+
+            aShader.ambient = colorVector;
+
+        } else if (parentName =="specular") {
+
+            aShader.specular = colorVector;
+
+        } else if (parentName == "reflective") {
+
+            aShader.reflective = colorVector;
+
+        }
+
 
     } else if (aShader.shadertypemap.find(eName) != aShader.shadertypemap.end()) {
 

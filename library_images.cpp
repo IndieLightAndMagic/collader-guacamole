@@ -29,7 +29,7 @@ bool GTech::ColladaVisitor::VisitEnter_library_images(const tinyxml2::XMLElement
     } else if (eName == "init_from") {
 
         anImage.path = GetElementText(e);
-    
+
     }
 
     return true;

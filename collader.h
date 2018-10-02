@@ -254,18 +254,6 @@ namespace GTech {
         Effect::ShaderType	    shaderType;
         std::string             imageId{};
 
-        std::map<std::string, glm::vec4*>colorpropertiesmap {
-                std::make_pair("emission", &emission),
-                std::make_pair("ambient", &ambient),
-                std::make_pair("diffuse", &diffuse),
-                std::make_pair("specular", &specular),
-                std::make_pair("reflective", &reflective)
-        };
-        std::map<std::string, float*>floatpropertiesmap {
-                std::make_pair("shininess", &shininess),
-                std::make_pair("index_of_refraction", &refractionIndex),
-        };
-
         void Print(std::string tab = std::string{'\t'} ){
 
             std::cout << std::endl;
