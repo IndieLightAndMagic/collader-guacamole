@@ -13,11 +13,6 @@ std::string GTech::ColladaVisitor::GetElementText(const XMLElement& e){
 
 }
 
-void GTech::ColladaVisitor::PrintSceneInfo(){
-
-    aScene.Print();
-
-}
 
 bool GTech::ColladaVisitor::VisitEnter(const XMLElement& e, const XMLAttribute* pa){
     
@@ -129,7 +124,6 @@ int main (){
     GTech::ColladaVisitor visitor;
     auto pVisitor = &visitor;
     doc.Accept(pVisitor);
-    visitor.PrintSceneInfo();
 
 	return 0;
 }

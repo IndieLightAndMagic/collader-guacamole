@@ -8,7 +8,7 @@
 #define GLM_ENABLE_EXPERIMENTAL
 #include "glm/gtx/string_cast.hpp"
 
-
+#include <string>
 #include <cassert>
 #include <iostream>
 #include <map>
@@ -16,65 +16,15 @@
 #include <utility>
 #include <vector>
 
+#include "idname.h"
+#include "camera.h"
+#include "image.h"
 namespace GTech {
 
 
-    struct IdName {
-        std::string id;
-        std::string name;
-        virtual void SetIdName(const tinyxml2::XMLAttribute *pa){
-            assert(pa != nullptr);
-            if (pa) id = pa->Value();
-            auto next = pa->Next();
-            assert(next != nullptr);
-            if (next) name = next->Value();
-        }
-        virtual void Print(std::string tab = std::string{'\t'}){
 
-            std::cout << "\n";
-            std::cout << tab << "id:  " << id << "\n";
-            std::cout << tab << "name:" << name << "\n";
-                
-        }
-    };
     
-    struct Image : public IdName {
-
-        std::string path{};
-        void Print(std::string tab = std::string{'\t'}){
-
-            std::cout << std::endl;
-            std::cout << tab << "Image:\n";
-            IdName::Print(tab);
-            std::cout << "\t" << "Image Path: " << path << std::endl;
-
-        }
-    };
     
-    struct Camera : public GTech::IdName {
-        
-        enum class ProjectionType {ORTO, PERS};
-        union {
-            float xmag;
-            float yfov;
-        }projection;
-        float aspect_ratio{};
-        float znear{0.1f};
-        float zfar{100.0f};
-        ProjectionType projectionType{ProjectionType::PERS};
-        
-        void Print(std::string tab = std::string{'\t'}){
-
-            std::cout << "\n";
-            std::cout << tab << "Camera:\n";
-            IdName::Print(tab);
-            auto projectionTypeString = projectionType == ProjectionType::PERS ? std::string{"perspective yfov: "} : std::string{"ortographic xmag: "};
-            std::cout << tab << "Projection Type: " << projectionTypeString << projection.yfov << "\n";
-            std::cout << tab << "zrange [ " << zfar << ", " << znear << " ]\n";
-            
-        }
-    };
-
     struct Light : public GTech::IdName {
 
         enum class LightType {POINT, SPOT, SUN};
@@ -84,21 +34,7 @@ namespace GTech {
 
         glm::vec3 color{1.0f, 0.0f, 0.0f};
         LightType lightType{GTech::Light::LightType::POINT};
-
-        void Print(std::string tab = std::string{'\t'}){
-
-            std::cout << "" << std::endl;
-            std::cout << tab << "Light:" << std::endl;
-            IdName::Print(tab);
-            auto lightTypeString = (lightType == LightType::POINT) ? std::string{"Point"} : ( (lightType == LightType::SPOT) ? std::string{"Spot"} : std::string{"Sun"} );
-            std::cout << tab << "Light Type: " << lightTypeString << "" << std::endl;
-            std::cout << tab << "Attenuation: " << std::endl;
-            std::cout << tab << " K: " << constant_attenuation << "" << std::endl;
-            std::cout << tab << " L: " << linear_attenuaton << "" << std::endl;
-            std::cout << tab << " Q: " << quadratic_attenuation << "" << std::endl;
-            std::cout << tab << "Color: " << glm::to_string(color)<< "" << std::endl;
-            
-        }
+        
     };
 
     struct MeshSource {
@@ -109,14 +45,6 @@ namespace GTech {
         unsigned int    index;
         unsigned int    size;
 
-        void Print(std::string tab = std::string{'\t'}){
-
-            std::cout << tab << "Stride: " << stride << std::endl;
-            std::cout << tab << "AxisOrder: " << stride << std::endl;
-            std::cout << tab << "Index: " << index << std::endl;
-            std::cout << tab << "Size: " << size  << std::endl;
-
-        }
     };
 
     struct MeshTrianglesInput {
@@ -132,21 +60,7 @@ namespace GTech {
             std::make_pair("TEXCOORD", GTech::MeshTrianglesInput::DataType::TEXCOORD)
         };             
 
-        void Print(std::string tab = std::string{'\t'}) {
-
-            std::map<MeshTrianglesInput::DataType, std::string> semanticstringMap{
-                std::make_pair(DataType::NONE, std::string{"NONE"}),
-                std::make_pair(DataType::TEXCOORD, std::string{"TEXCOORD"}),
-                std::make_pair(DataType::NORMAL, std::string{"NORMAL"}),
-                std::make_pair(DataType::VERTEX, std::string{"VERTEX"})
-            };
-
         
-            std::cout << tab << "Semantic: " << semanticstringMap[semanticType];
-            std::cout << " Source: " << source;
-            std::cout << " Offset: " << std::endl;
-
-        }
     };
 
     struct MeshTriangles {
@@ -156,31 +70,7 @@ namespace GTech {
         std::vector<MeshTrianglesInput> meshTrianglesInput{};
         std::vector<unsigned int>       indexArray{};
 
-        void Print(std::string tab = std::string{'\t'} ){
-
-            std::cout << tab << "Count: " << count << std::endl;
-            std::cout << tab << "Material: " << material << std::endl;
-            std::cout << tab << "Triangles Inputs: " << std::endl;
-            
-            for (auto& meshTriangleInput : meshTrianglesInput){
-                meshTriangleInput.Print(tab+'\t');
-            }
-
-            
-            auto indexArraySize = indexArray.size();
-            std::cout << tab << "Index Array Count: " << indexArraySize << " Indexes Array: "<< std::endl;
-            
-            static unsigned int indexCount = 0;
-            for (auto& index: indexArray){
-                
-                if (!indexCount) std::cout << tab; std::cout << index; if (indexCount < (indexArraySize - 1)) std::cout <<", ";  
-                indexCount++;
-
-            }
-            indexCount = 0;
-            std::cout << std::endl;
-
-        }
+        
     };
 
     struct Mesh : public GTech::IdName {
@@ -189,47 +79,6 @@ namespace GTech {
         std::vector<GTech::MeshTriangles>           triangleArray{};
         std::vector<float>                          floatVector{};
         
-        void Print(std::string tab = std::string{'\t'}){
-
-            std::cout << std::endl;
-            std::cout << tab << "Mesh: " << std::endl;
-            IdName::Print(tab);
-
-            for (auto& meshname_meshsource: meshSourceMap){
-
-                auto meshName   = meshname_meshsource.first;
-                auto meshSource = meshname_meshsource.second;
-
-                std::cout << tab << "Mesh Name: " << meshName << std::endl;  
-                meshSource.Print(tab+'\t');
-
-            }
-            
-            std::cout << tab << "Triangle Arrays: " << std::endl;
-            for (auto &anArray : triangleArray){
-                anArray.Print(tab+'\t');
-            }
-
-            std::cout << tab << "Float Data: ";
-
-            static unsigned int strideCount = 0;
-            for (auto &aFloat: floatVector){
-
-                
-                if (strideCount%3 == 0)
-                    std::cout << std::endl << tab << "[" << strideCount / 3 << "]";
-
-                std::cout << " " << aFloat;
-
-                if (strideCount%3 <  2)
-                    std::cout << ",";
-
-                strideCount++;
-
-            }            
-            strideCount = 0;
-            std::cout << std::endl;
-        }
     };
 
     struct Effect : public GTech::IdName{
@@ -254,44 +103,12 @@ namespace GTech {
         Effect::ShaderType	    shaderType;
         std::string             imageId{};
 
-        void Print(std::string tab = std::string{'\t'} ){
-
-            std::cout << std::endl;
-            std::cout << tab << "Effect:" << std::endl;
-            tab = tab + '\t';
-
-            IdName::Print(tab);
-        	std::map<ShaderType, std::string>shaderTypeMap {
-        		std::make_pair(ShaderType::BLINN, "blinn"),
-        		std::make_pair(ShaderType::CONSTANT, "constant"),
-        		std::make_pair(ShaderType::LAMBERT, "lambert"),
-        		std::make_pair(ShaderType::PHONG, "phong"),
-        	};
-            auto shaderTypeString = shaderTypeMap[shaderType];
-            
-            std::cout << tab << "Image Id: " << imageId << std::endl;
-            std::cout << tab << "ShaderType: " << shaderTypeString << std::endl;
-            std::cout << tab << "Emission: " << glm::to_string(emission) << std::endl;      
-            std::cout << tab << "Ambient: " << glm::to_string(ambient) << std::endl;      
-            std::cout << tab << "Diffuse: " << glm::to_string(diffuse) << std::endl;      
-            std::cout << tab << "Specular: " << glm::to_string(specular) << std::endl;
-            std::cout << tab << "Shininess: " << shininess << std::endl;
-            std::cout << tab << "Refraction Index: " << refractionIndex << std::endl;
-
-        }
     };
 
     struct Material : public GTech::IdName {
 
         std::string     effectUrl{};
 
-        void Print(std::string tab = std::string{'\t'}){
-
-            std::cout << std::endl;
-            std::cout << tab << "Material: " << std::endl;
-            IdName::Print(tab + '\t');
-
-        }
     };
 
     struct Node : public GTech::IdName {
@@ -307,35 +124,6 @@ namespace GTech {
         std::map<std::string, std::string>  instanced_materials{};
         Node::NodeType                      nodeType{};
         
-        void Print(std::string tab = std::string{'\t'}){
-
-            std::cout << std::endl;
-            std::cout << tab << "Node" << std::endl;
-            IdName::Print(tab);
-            for (auto&key_value : nodeTypeMap){
-                auto key    = key_value.first;
-                auto value  = key_value.second;
-                if (value != nodeType) continue;
-                std::cout << tab << "Instance Type: " << key << " URL: " << url << std::endl;
-            }
-            if (!instanced_materials.empty()){
-
-                auto tab_ = tab + std::string{"\t"};
-                std::cout << tab << "Binded Materials:\n";
-                for (auto& materialName_materialInstance : instanced_materials){
-
-                    auto materialName       = materialName_materialInstance.first;
-                    auto materialInstance   = materialName_materialInstance.second;
-                    std::cout << tab_ << " Name: " << materialName;
-                    std::cout << " "  << " MaterialId: " << materialInstance << std::endl;
-                    
-                }    
-            }
-             
-            std::cout << tab << "Transform Matrix: " << std::endl;
-            std::cout << tab << glm::to_string(transform) << std::endl;
-
-        }        
     };
 
     struct Scene : public GTech::IdName {
@@ -359,67 +147,6 @@ namespace GTech {
         std::vector<float> geometricalData{};
 
         std::map<std::string, GTech::IdName*> nodePtrMap;
-
-        
-
-        void Print(std::string tab = std::string{'\t'}){
-            std::cout << "\n";
-
-            std::cout << "Exporting Tool: " << authoring_tool << std::endl;
-            std::cout << "Created By    : " << created << std::endl;
-            std::cout << "Modified      : " << modified << std::endl;
-    
-            std::cout << "\n";
-            IdName::Print(tab);
-            for (auto& materialname_material : materials){
-                
-                auto material   = materialname_material.second;
-                material.Print(tab + '\t');
-                
-                auto effectUrl  = material.effectUrl;
-                if (!effectUrl.empty()){
-                
-                    auto effect     = dynamic_cast<GTech::Effect*>(nodePtrMap[effectUrl]);
-                    effect->Print(tab + '\t' + '\t');
-                    
-                    auto imageUrl   = effect->imageId;
-                    if (!imageUrl.empty()) {
-
-                        auto image  = dynamic_cast<GTech::Image*>(nodePtrMap[imageUrl]);
-                        image->Print(tab + '\t' + '\t' + '\t');
-                    
-                    }
-                }
-            }
-            tab = tab + '\t';
-            for (auto& nodename_node : nodes){
-                
-                auto nodename   = nodename_node.first;
-                auto node       = nodename_node.second;
-                node.Print(tab);
-
-                if (node.nodeType == GTech::Node::NodeType::CAMERA) {
-
-                    auto pCamera    = nodePtrMap[node.url];
-                    pCamera->Print(tab + '\t');
-
-                } else if (node.nodeType == GTech::Node::NodeType::MESH) {
-
-                    auto pMesh      = nodePtrMap[node.url];
-                    pMesh->Print(tab + '\t');
-
-                } else if (node.nodeType == GTech::Node::NodeType::LIGHT) {
-
-                    auto pLight     = nodePtrMap[node.url];
-                    pLight->Print(tab + '\t');    
-
-                }
-
-            }
-
-            
-
-        }
 
 
 
