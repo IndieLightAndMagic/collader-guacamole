@@ -5,9 +5,6 @@
 #include "tinyxml2/tinyxml2.h"
 #include "glm/glm.hpp"
 
-#define GLM_ENABLE_EXPERIMENTAL
-#include "glm/gtx/string_cast.hpp"
-
 #include <string>
 #include <cassert>
 #include <iostream>
