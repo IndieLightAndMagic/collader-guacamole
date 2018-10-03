@@ -26,6 +26,8 @@ bool GTech::ColladaVisitor::VisitEnter_library_materials(const tinyxml2::XMLElem
         auto pUrlValue = attrMap["url"].c_str() + 1;
         pMaterialTmp->effectUrl = std::string{pUrlValue};
 
+
+
     }
 
     return true;

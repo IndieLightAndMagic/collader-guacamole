@@ -43,18 +43,26 @@ bool GTech::ColladaVisitor::VisitEnter_library_visual_scenes(const tinyxml2::XML
 
     } else if (pNodeTmp->nodeTypeMap.find(eName) != pNodeTmp->nodeTypeMap.end()){
 
-        auto pUrl       = attrMap["url"].c_str() + 1;
+        auto pUrl           = attrMap["url"].c_str() + 1;
         pNodeTmp->url       = std::string{pUrl};
         pNodeTmp->nodeType  = pNodeTmp->nodeTypeMap[eName];
 
     } else if (eName == "instance_material") {
 
-        auto insmat_key = attrMap["symbol"];
-        auto insmat_val = std::string{attrMap["target"].c_str() + 1};
+        auto symbol                 = attrMap["symbol"];
+        auto target                 = std::string{attrMap["target"].c_str() + 1};
+        
+        for ( auto& url_idname: aScene.urlPtrMap){
 
-        pNodeTmp->instanced_materials[insmat_key] = insmat_val;
+            //Lookout for target
+            if (url_idname.first != target) continue;
 
-    } 
+            //Target found, create a new entry pointer to the same idname;
+            aScene.urlPtrMap[symbol]    = url_idname.second;
+
+        }
+
+    }
 
     return true;
 }

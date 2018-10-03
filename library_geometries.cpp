@@ -37,7 +37,8 @@ bool GTech::ColladaVisitor::VisitEnter_library_geometries(const tinyxml2::XMLEle
 
     } else if (eName == "source") {
 
-        pMeshSourceTmp = std::make_shared<GTech::MeshSource>();
+        pMeshSourceTmp                          = std::make_shared<GTech::MeshSource>();
+        pMeshTmp->meshSourceMap[attrMap["id"]]  = pMeshSourceTmp;
 
     } else if (eName == "accesor") {
 
@@ -84,11 +85,20 @@ bool GTech::ColladaVisitor::VisitEnter_library_geometries(const tinyxml2::XMLEle
 
     } else if (eName == "input") {
 
-        auto aMeshTriangleInput             = GTech::MeshTrianglesInput{};
-        aMeshTriangleInput.source          = std::string{attrMap["source"].c_str() + 1};
-        aMeshTriangleInput.semanticType    = aMeshTriangleInput.semanticTypeMap[attrMap["semantic"]];
-        std::stringstream{attrMap["offset"]}    >> aMeshTriangleInput.source;
-        pMeshTrianglesTmp->meshTrianglesInput.push_back(aMeshTriangleInput); 
+        if (parentName == "vertices"){
+
+            auto idKey                                      = std::string{attrMap["source"].c_str() + 1};
+            pMeshTmp->meshSourceMap[attrMapParent["id"]]    = pMeshTmp->meshSourceMap[idKey];
+
+        } else if (parentName == "triangles") {
+
+            auto aMeshTriangleInput                 = GTech::MeshTrianglesInput{};
+            aMeshTriangleInput.source               = std::string{attrMap["source"].c_str() + 1};
+            aMeshTriangleInput.semanticType         = aMeshTriangleInput.semanticTypeMap[attrMap["semantic"]];
+            std::stringstream{attrMap["offset"]}    >> aMeshTriangleInput.offset;
+            pMeshTrianglesTmp->meshTrianglesInput.push_back(aMeshTriangleInput);
+
+        }
 
     } else if (eName == "triangles") {
 

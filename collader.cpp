@@ -124,6 +124,7 @@ int main (){
     GTech::ColladaVisitor visitor;
     auto pVisitor = &visitor;
     doc.Accept(pVisitor);
+    auto aScene = visitor.GetScene();
 
 	return 0;
 }
