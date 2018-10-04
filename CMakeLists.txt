@@ -64,39 +64,6 @@ file(MAKE_DIRECTORY ${GTECH_DIR_INC})
 add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
 	COMMAND ${CMAKE_COMMAND} -E copy lib${TARGET_NAME}.a ${GTECH_DIR}/3rd/lib
 	COMMAND ${CMAKE_COMMAND} -E copy ${ROOT_DIR}/*.h ${GTECH_DIR}/3rd/include/collader
-	) 
+	COMMAND ${CMAKE_COMMAND} -E copy ${ROOT_DIR}/tinyxml2/*.h ${GTECH_DIR}/3rd/include/collader
+    ) 
 
-add_executable(${TARGET_NAME}test  
-
-    collader.h 
-    collader.cpp 
-    library_visual_scenes.cpp 
-    library_lights.cpp 
-    library_cameras.cpp 
-    library_materials.cpp 
-    library_effects.cpp 
-    library_geometries.cpp 
-    library_images.cpp 
-    tinyxml2/tinyxml2.cpp 
-    tinyxml2/tinyxml2.h
-    idname.h 
-    idname.cpp
-    camera.h 
-    camera.cpp 
-    light.h
-    light.cpp
-    mesh.h
-    mesh.cpp
-    effect.h
-    effect.cpp
-    material.h
-    material.cpp    
-    node.h
-    node.cpp
-    scene.h
-    scene.cpp
-    glcollader.cpp
-    colladertest.cpp
-)
-
-target_include_directories(${TARGET_NAME}test PUBLIC ${GLM_DIR})
