@@ -7,10 +7,9 @@ project(${TARGET_NAME})
 set(CMAKE_CXX_STANDARD 17)
 
 #Installation directory 
-get_filename_component(DIST_DIR $ENV{GTECH_ROOT} ABSOLUTE)
-set(DIST_DIR_LIB ${DIST_DIR}/3rd/lib/)
-set(DIST_DIR_INC ${DIST_DIR}/3rd/include/collader)
-
+get_filename_component(GTECH_DIR $ENV{GTECH_ROOT} ABSOLUTE)
+set(GTECH_DIR_LIB ${GTECH_DIR}/3rd/lib/)
+set(GTECH_DIR_INC ${GTECH_DIR}/3rd/include/collader)
 
 #DIRECTORIES
 get_filename_component(ROOT_DIR "." ABSOLUTE)
@@ -21,7 +20,7 @@ message(STATUS "CMAKE_CURRENT_BINARY_DIR: ${CMAKE_CURRENT_BINARY_DIR}")
 message(STATUS "-----------------------------")
 
 #GLM
-set(GLM_DIR "${ROOT_DIR}/../GLM")
+set(GLM_DIR "${GTECH_DIR}/GLM")
 
 
 add_library(${TARGET_NAME} STATIC
@@ -56,15 +55,15 @@ add_library(${TARGET_NAME} STATIC
 )
 target_include_directories(${TARGET_NAME} PUBLIC ${GLM_DIR})
 
-file(MAKE_DIRECTORY ${DIST_DIR})
-file(MAKE_DIRECTORY ${DIST_DIR_LIB})
-file(MAKE_DIRECTORY ${DIST_DIR_INC})
+file(MAKE_DIRECTORY ${GTECH_DIR})
+file(MAKE_DIRECTORY ${GTECH_DIR_LIB})
+file(MAKE_DIRECTORY ${GTECH_DIR_INC})
 
 
 #POST BUILD COMMANDS 
 add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
-	COMMAND ${CMAKE_COMMAND} -E copy lib${TARGET_NAME}.a ${DIST_DIR}/3rd/lib
-	COMMAND ${CMAKE_COMMAND} -E copy ${ROOT_DIR}*.h ${DIST_DIR}/3rd/include/collader
+	COMMAND ${CMAKE_COMMAND} -E copy lib${TARGET_NAME}.a ${GTECH_DIR}/3rd/lib
+	COMMAND ${CMAKE_COMMAND} -E copy ${ROOT_DIR}*.h ${GTECH_DIR}/3rd/include/collader
 	) 
 
 add_executable(${TARGET_NAME}test  
