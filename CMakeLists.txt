@@ -63,7 +63,7 @@ file(MAKE_DIRECTORY ${GTECH_DIR_INC})
 #POST BUILD COMMANDS 
 add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
 	COMMAND ${CMAKE_COMMAND} -E copy lib${TARGET_NAME}.a ${GTECH_DIR}/3rd/lib
-	COMMAND ${CMAKE_COMMAND} -E copy ${ROOT_DIR}*.h ${GTECH_DIR}/3rd/include/collader
+	COMMAND ${CMAKE_COMMAND} -E copy ${ROOT_DIR}/*.h ${GTECH_DIR}/3rd/include/collader
 	) 
 
 add_executable(${TARGET_NAME}test  
