@@ -6,7 +6,7 @@ using namespace GTech;
 int main (){
 
     XMLDocument doc;
-    doc.LoadFile("../simple.dae");
+    doc.LoadFile("../../resources/simple.dae");
 
     ColladaVisitor visitor;
     auto pVisitor = &visitor;

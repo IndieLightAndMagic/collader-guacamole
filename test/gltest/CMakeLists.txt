@@ -14,41 +14,30 @@ message(STATUS "CMAKE_SOURCE_DIR: ${CMAKE_SOURCE_DIR}")
 message(STATUS "CMAKE_CURRENT_BINARY_DIR: ${CMAKE_CURRENT_BINARY_DIR}")
 message(STATUS "-----------------------------")
 
+#GTECH directory 
+#Installation directory 
+get_filename_component(GTECH_DIR $ENV{GTECH_ROOT} ABSOLUTE)
+set(GTECH_DIR_LIB ${GTECH_DIR}/3rd/lib)
+set(GTECH_DIR_INC ${GTECH_DIR}/3rd/include)
+
+
 #GLM
-set(GLM_DIR "${ROOT_DIR}/../GLM")
+set(GLM_INC_DIR ${GTECH_DIR}/GLM)
+#COLLADER
+set(COLLADER_INC_DIR ${GTECH_DIR_INC}/collader)
 
+add_executable(${TARGET_NAME}  
 
-add_executable(${TARGET_NAME}test  
-
-    collader.h 
-    collader.cpp 
-    library_visual_scenes.cpp 
-    library_lights.cpp 
-    library_cameras.cpp 
-    library_materials.cpp 
-    library_effects.cpp 
-    library_geometries.cpp 
-    library_images.cpp 
-    tinyxml2/tinyxml2.cpp 
-    tinyxml2/tinyxml2.h
-    idname.h 
-    idname.cpp
-    camera.h 
-    camera.cpp 
-    light.h
-    light.cpp
-    mesh.h
-    mesh.cpp
-    effect.h
-    effect.cpp
-    material.h
-    material.cpp    
-    node.h
-    node.cpp
-    scene.h
-    scene.cpp
-    glcollader.cpp
-    colladertest.cpp
+    gltest.cpp
+    
 )
 
-target_include_directories(${TARGET_NAME}test PUBLIC ${GLM_DIR})
+#========= INCLUDE ==============#
+
+target_include_directories(${TARGET_NAME} PUBLIC ${GLM_INC_DIR})
+target_include_directories(${TARGET_NAME} PUBLIC ${COLLADER_INC_DIR})
+
+#========== LINK ================#
+
+target_link_libraries(${TARGET_NAME} ${GTECH_DIR_LIB}/libcollader.a)
+
