@@ -24,7 +24,7 @@ set(GLM_DIR "${GTECH_DIR}/GLM")
 
 
 add_library(${TARGET_NAME} STATIC
-    collader.h 
+ 
     collader.cpp 
     library_visual_scenes.cpp 
     library_lights.cpp 
@@ -34,36 +34,29 @@ add_library(${TARGET_NAME} STATIC
     library_geometries.cpp 
     library_images.cpp 
     tinyxml2/tinyxml2.cpp 
-    tinyxml2/tinyxml2.h
-    idname.h 
     idname.cpp
-    camera.h 
     camera.cpp 
-    light.h
     light.cpp
-    mesh.h
     mesh.cpp
-    effect.h
     effect.cpp
-    material.h
-    material.cpp    
-    node.h
+    material.cpp 
     node.cpp
-    scene.h
     scene.cpp
     glcollader.cpp
+
 )
 target_include_directories(${TARGET_NAME} PUBLIC ${GLM_DIR})
 
 file(MAKE_DIRECTORY ${GTECH_DIR})
 file(MAKE_DIRECTORY ${GTECH_DIR_LIB})
 file(MAKE_DIRECTORY ${GTECH_DIR_INC})
+file(MAKE_DIRECTORY ${GTECH_DIR_INC}/tinyxml2)
 
 
 #POST BUILD COMMANDS 
 add_custom_command(TARGET ${TARGET_NAME} POST_BUILD
 	COMMAND ${CMAKE_COMMAND} -E copy lib${TARGET_NAME}.a ${GTECH_DIR}/3rd/lib
 	COMMAND ${CMAKE_COMMAND} -E copy ${ROOT_DIR}/*.h ${GTECH_DIR}/3rd/include/collader
-	COMMAND ${CMAKE_COMMAND} -E copy ${ROOT_DIR}/tinyxml2/*.h ${GTECH_DIR}/3rd/include/collader
+	COMMAND ${CMAKE_COMMAND} -E copy ${ROOT_DIR}/tinyxml2/*.h ${GTECH_DIR}/3rd/include/collader/tinyxml2
     ) 
 
