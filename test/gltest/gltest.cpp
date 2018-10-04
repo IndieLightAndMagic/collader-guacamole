@@ -2,7 +2,14 @@
 #include <stdio.h>
 /* Ensure we are using opengl's core profile only */
 #define GL3_PROTOTYPES 1
-#include <GL3/gl3.h>
+
+#ifdef __APPLE__
+#include <OpenGL/gl3.h>
+#include <OpenGL/glext.h>
+#else 
+#include <OpenGL/gl.h>
+#endif /*__APPLE__*/
+
 
 #include <SDL.h>
 
