@@ -1,7 +1,7 @@
-#include <stdlib.h>
-#include <stdio.h>
-/* Ensure we are using opengl's core profile only */
-#define GL3_PROTOTYPES 1
+#include <cstdlib>
+#include <cstdio>
+#include <string>
+
 
 #ifdef __APPLE__
 #include <OpenGL/gl3.h>
@@ -11,12 +11,10 @@
 #endif /*__APPLE__*/
 
 
-#include <SDL.h>
-
-#define PROGRAM_NAME "Tutorial2"
+#include <SDLWrapper/sdlwrapper.h>
 
 /* A simple function that will read a file into an allocated char pointer buffer */
-char* filetobuf(char *file)
+char* filetobuf(const char *file)
 {
     FILE *fptr;
     long length;
@@ -36,48 +34,12 @@ char* filetobuf(char *file)
     return buf; /* Return the buffer */
 }
 
-/* A simple function that prints a message, the error code returned by SDL, and quits the application */
-void sdldie(char *msg)
-{
-    printf("%s: %s\n", msg, SDL_GetError());
-    SDL_Quit();
-    exit(1);
-}
 
-void setupwindow(SDL_WindowID *window, SDL_GLContext *context)
-{
-    if (SDL_Init(SDL_INIT_VIDEO) < 0) /* Initialize SDL's Video subsystem */
-        sdldie("Unable to initialize SDL"); /* Or die on error */
-
-    /* Request an opengl 3.2 context.
-     * SDL doesn't have the ability to choose which profile at this time of writing,
-     * but it should default to the core profile */
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
-
-    /* Turn on double buffering with a 24bit Z buffer.
-     * You may need to change this to 16 or 32 for your system */
-    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-
-    /* Create our window centered at 512x512 resolution */
-    *window = SDL_CreateWindow(PROGRAM_NAME, SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-        512, 512, SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN);
-    if (!*window) /* Die if creation failed */
-        sdldie("Unable to create window");
-
-    /* Create our opengl context and attach it to our window */
-    *context = SDL_GL_CreateContext(*window);
-
-    /* This makes our buffer swap syncronized with the monitor's vertical refresh */
-    SDL_GL_SetSwapInterval(1);
-}
-
-void drawscene(SDL_WindowID window)
+void drawscene()
 {
     int i; /* Simple iterator */
     GLuint vao, vbo[2]; /* Create handles for our Vertex Array Object and two Vertex Buffer Objects */
-    int IsCompiled_VS, IsCompiled_FS;
+    int isCompiled_VS, isCompiled_FS;
     int IsLinked;
     int maxLength;
     char *vertexInfoLog;
@@ -142,8 +104,8 @@ void drawscene(SDL_WindowID window)
     glEnableVertexAttribArray(1);
 
     /* Read our shaders into the appropriate buffers */
-    vertexsource = filetobuf("tutorial2.vert");
-    fragmentsource = filetobuf("tutorial2.frag");
+    vertexsource = filetobuf(std::string{"../gltest.vert"}.c_str());
+    fragmentsource = filetobuf(std::string{"../gltest.frag"}.c_str());
 
     /* Create an empty vertex shader handle */
     vertexshader = glCreateShader(GL_VERTEX_SHADER);
@@ -156,8 +118,8 @@ void drawscene(SDL_WindowID window)
     /* Compile the vertex shader */
     glCompileShader(vertexshader);
 
-    glGetShaderiv(vertexshader, GL_COMPILE_STATUS, &IsCompiled_VS);
-    if(IsCompiled_VS == FALSE)
+    glGetShaderiv(vertexshader, GL_COMPILE_STATUS, &isCompiled_VS);
+    if(isCompiled_VS == GL_FALSE)
     {
        glGetShaderiv(vertexshader, GL_INFO_LOG_LENGTH, &maxLength);
 
@@ -183,8 +145,8 @@ void drawscene(SDL_WindowID window)
     /* Compile the fragment shader */
     glCompileShader(fragmentshader);
 
-    glGetShaderiv(fragmentshader, GL_COMPILE_STATUS, &IsCompiled_FS);
-    if(IsCompiled_FS == FALSE)
+    glGetShaderiv(fragmentshader, GL_COMPILE_STATUS, &isCompiled_FS);
+    if(isCompiled_FS == GL_FALSE)
     {
        glGetShaderiv(fragmentshader, GL_INFO_LOG_LENGTH, &maxLength);
 
@@ -224,7 +186,7 @@ void drawscene(SDL_WindowID window)
     /* too many texel fetch instructions or too many interpolators or dynamic loops. */
 
     glGetProgramiv(shaderprogram, GL_LINK_STATUS, (int *)&IsLinked);
-    if(IsLinked == FALSE)
+    if(IsLinked == GL_FALSE)
     {
        /* Noticed that glGetProgramiv is used to get the length for a shader program, not glGetShaderiv. */
        glGetProgramiv(shaderprogram, GL_INFO_LOG_LENGTH, &maxLength);
@@ -256,7 +218,7 @@ void drawscene(SDL_WindowID window)
         glDrawArrays(GL_LINE_LOOP, 0, i);
 
         /* Swap our buffers to make our changes visible */
-        SDL_GL_SwapWindow(window);
+        GTech::SDLGlSwapWindow();
 
         /* Sleep for 2 seconds */
         SDL_Delay(2000);
@@ -277,27 +239,24 @@ void drawscene(SDL_WindowID window)
     free(fragmentsource);
 }
 
-void destroywindow(SDL_WindowID window, SDL_GLContext context)
+void destroywindow()
 {
-    SDL_GL_DeleteContext(context);
-    SDL_DestroyWindow(window);
-    SDL_Quit();
+
+    GTech::SDLDestroyWindow();
+    GTech::SDLQuit();
+
 }
 
 /* Our program's entry point */
 int main(int argc, char *argv[])
 {
-    SDL_WindowID mainwindow; /* Our window handle */
-    SDL_GLContext maincontext; /* Our opengl context handle */
-
-    /* Create our window, opengl context, etc... */
-    setupwindow(&mainwindow, &maincontext);
+    GTech::SDLInitialization();
 
     /* Call our function that performs opengl operations */
-    drawscene(mainwindow);
+    drawscene();
 
     /* Delete our opengl context, destroy our window, and shutdown SDL */
-    destroywindow(mainwindow, maincontext);
+    destroywindow();
 
     return 0;
 }

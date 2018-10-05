@@ -29,6 +29,7 @@ set(COLLADER_INC_DIR ${GTECH_DIR_INC}/collader)
 
 #SDL2 
 set(SDL2_INC_DIR ${GTECH_DIR}/SDL/include) 
+set(SDL2_LIB_DIR ${GTECH_DIR}/SDLMake2) 
 
 add_executable(${TARGET_NAME}  
 
@@ -41,7 +42,18 @@ add_executable(${TARGET_NAME}
 target_include_directories(${TARGET_NAME} PUBLIC ${GLM_INC_DIR})
 target_include_directories(${TARGET_NAME} PUBLIC ${COLLADER_INC_DIR})
 target_include_directories(${TARGET_NAME} PUBLIC ${SDL2_INC_DIR})
+target_include_directories(${TARGET_NAME} PUBLIC ${GTECH_DIR_INC})
+
 #========== LINK ================#
 
-target_link_libraries(${TARGET_NAME} ${GTECH_DIR_LIB}/libcollader.a)
+target_link_libraries(${TARGET_NAME} 
+	${GTECH_DIR_LIB}/libcollader.a ${GTECH_DIR_LIB}/libsdlwrapper.a ${GTECH_DIR_LIB}/libSDL2d.a  
+	${GTECH_DIR_LIB}/SDL2_image.framework/SDL2_image "-liconv" "-lm")
+
+#========== MacOS ===============#
+
+target_link_libraries(${PROJECT_NAME}
+		"-framework Carbon" "-framework ForceFeedback" "-framework IOKit" "-framework Cocoa" "-framework CoreVideo"
+		"-framework AudioToolbox" "-framework CoreAudio" "-framework Foundation" "-framework AppKit" "-framework GLUT" 
+		"-framework OpenGL")
 
