@@ -23,8 +23,12 @@ set(GTECH_DIR_INC ${GTECH_DIR}/3rd/include)
 
 #GLM
 set(GLM_INC_DIR ${GTECH_DIR}/GLM)
+
 #COLLADER
 set(COLLADER_INC_DIR ${GTECH_DIR_INC}/collader)
+
+#SDL2 
+set(SDL2_INC_DIR ${GTECH_DIR}/SDL/include) 
 
 add_executable(${TARGET_NAME}  
 
@@ -36,7 +40,7 @@ add_executable(${TARGET_NAME}
 
 target_include_directories(${TARGET_NAME} PUBLIC ${GLM_INC_DIR})
 target_include_directories(${TARGET_NAME} PUBLIC ${COLLADER_INC_DIR})
-
+target_include_directories(${TARGET_NAME} PUBLIC ${SDL2_INC_DIR})
 #========== LINK ================#
 
 target_link_libraries(${TARGET_NAME} ${GTECH_DIR_LIB}/libcollader.a)
