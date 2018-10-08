@@ -13,6 +13,7 @@
 
 
 #include <SDLWrapper/sdlwrapper.h>
+#include <ShaderMan/shdr.h>
 
 /* A simple function that will read a file into an allocated char pointer buffer */
 std::vector<char> filetobuf(const char *file)
@@ -56,9 +57,29 @@ void PrintShader(std::string msg, std::vector<char> buffer) {
 }
 void ErrorMessage(std::string msg) {
 
-    std::cout << ">>>>>>>>\n" << msg <<  "<<<<<<<<< " <<  std::endl;
+    std::cout << ">>>>>>>>" << std::endl << msg <<  "<<<<<<<<<" <<  std::endl;
 
 }
+GTech::Program InitScene() {
+
+    auto vtxShaderSrc = GTech::ShaderSource("../gltest.vert");
+    auto vtxShader    = GTech::Shader(&vtxShaderSrc, GL_VERTEX_SHADER);
+    
+    auto frgShaderSrc = GTech::ShaderSource("../gltest.frag");
+    auto frgShader    = GTech::Shader(&frgShaderSrc, GL_FRAGMENT_SHADER);
+
+    auto program = GTech::Program();
+    program.pushShader(&vtxShader);
+    program.pushShader(&frgShader);
+
+    program.link();
+
+    auto programIsLinked = program.isLinked();
+
+    return program; 
+
+}
+
 void drawscene()
 {
     int i; /* Simple iterator */
@@ -87,9 +108,6 @@ void drawscene()
     
     /* These are handles used to reference the shaders */
     GLuint vertexshader, fragmentshader;
-
-    /* This is a handle to the shader program */
-    GLuint shaderprogram;
 
     /* Allocate and assign a Vertex Array Object to our handle */
     glGenVertexArrays(1, &vao);
@@ -126,114 +144,13 @@ void drawscene()
     /* Enable attribute index 1 as being used */
     glEnableVertexAttribArray(1);
 
-    /* Read our shaders into the appropriate buffers */
-    auto vertexsource = filetobuf("../gltest.vert");
-    auto fragmentsource = filetobuf("../gltest.frag");
-    auto vertexsourcedata = vertexsource.data();
-    auto fragmentsourcedata = fragmentsource.data();
+    /* Get GPU Program */
+    auto shaderprogram = InitScene();
+    shaderprogram.use();
+    
+    
 
-    /* Create an empty vertex shader handle */
-    vertexshader = glCreateShader(GL_VERTEX_SHADER);
-
-    /* Send the vertex shader source code to GL */
-    /* Note that the source code is NULL character terminated. */
-    /* GL will automatically detect that therefore the length info can be 0 in this case (the last parameter) */
-    PrintShader("Vertex", vertexsource);
-    glShaderSource(vertexshader, 1, (const GLchar**)&vertexsourcedata, 0);
-
-    /* Compile the vertex shader */
-    glCompileShader(vertexshader);
-
-    glGetShaderiv(vertexshader, GL_COMPILE_STATUS, &isCompiled_VS);
-    if(isCompiled_VS == GL_FALSE)
-    {
-       glGetShaderiv(vertexshader, GL_INFO_LOG_LENGTH, &maxLength);
-
-       /* The maxLength includes the NULL character */
-       vertexInfoLog = (char *)malloc(maxLength);
-
-       glGetShaderInfoLog(vertexshader, maxLength, &maxLength, vertexInfoLog);
-       ErrorMessage(std::string{vertexInfoLog});
-
-       /* Handle the error in an appropriate way such as displaying a message or writing to a log file. */
-       /* In this simple program, we'll just leave */
-       free(vertexInfoLog);
-       return;
-    }
-
-    /* Create an empty fragment shader handle */
-    fragmentshader = glCreateShader(GL_FRAGMENT_SHADER);
-
-    /* Send the fragment shader source code to GL */
-    /* Note that the source code is NULL character terminated. */
-    /* GL will automatically detect that therefore the length info can be 0 in this case (the last parameter) */
-    glShaderSource(fragmentshader, 1, (const GLchar**)&fragmentsource, 0);
-
-    /* Compile the fragment shader */
-    glCompileShader(fragmentshader);
-
-    glGetShaderiv(fragmentshader, GL_COMPILE_STATUS, &isCompiled_FS);
-    if(isCompiled_FS == GL_FALSE)
-    {
-       glGetShaderiv(fragmentshader, GL_INFO_LOG_LENGTH, &maxLength);
-
-       /* The maxLength includes the NULL character */
-       fragmentInfoLog = (char *)malloc(maxLength);
-
-       glGetShaderInfoLog(fragmentshader, maxLength, &maxLength, fragmentInfoLog);
-       ErrorMessage(std::string{fragmentInfoLog});
-
-       /* Handle the error in an appropriate way such as displaying a message or writing to a log file. */
-       /* In this simple program, we'll just leave */
-       free(fragmentInfoLog);
-       return;
-    }
-
-    /* If we reached this point it means the vertex and fragment shaders compiled and are syntax error free. */
-    /* We must link them together to make a GL shader program */
-    /* GL shader programs are monolithic. It is a single piece made of 1 vertex shader and 1 fragment shader. */
-    /* Assign our program handle a "name" */
-    shaderprogram = glCreateProgram();
-
-    /* Attach our shaders to our program */
-    glAttachShader(shaderprogram, vertexshader);
-    glAttachShader(shaderprogram, fragmentshader);
-
-    /* Bind attribute index 0 (coordinates) to in_Position and attribute index 1 (color) to in_Color */
-    /* Attribute locations must be setup before calling glLinkProgram. */
-    glBindAttribLocation(shaderprogram, 0, "in_Position");
-    glBindAttribLocation(shaderprogram, 1, "in_Color");
-
-    /* Link our program */
-    /* At this stage, the vertex and fragment programs are inspected, optimized and a binary code is generated for the shader. */
-    /* The binary code is uploaded to the GPU, if there is no error. */
-    glLinkProgram(shaderprogram);
-
-    /* Again, we must check and make sure that it linked. If it fails, it would mean either there is a mismatch between the vertex */
-    /* and fragment shaders. It might be that you have surpassed your GPU's abilities. Perhaps too many ALU operations or */
-    /* too many texel fetch instructions or too many interpolators or dynamic loops. */
-
-    glGetProgramiv(shaderprogram, GL_LINK_STATUS, (int *)&IsLinked);
-    if(IsLinked == GL_FALSE)
-    {
-       /* Noticed that glGetProgramiv is used to get the length for a shader program, not glGetShaderiv. */
-       glGetProgramiv(shaderprogram, GL_INFO_LOG_LENGTH, &maxLength);
-
-       /* The maxLength includes the NULL character */
-       shaderProgramInfoLog = (char *)malloc(maxLength);
-
-       /* Notice that glGetProgramInfoLog, not glGetShaderInfoLog. */
-       glGetProgramInfoLog(shaderprogram, maxLength, &maxLength, shaderProgramInfoLog);
-       ErrorMessage(std::string{shaderProgramInfoLog});
-       /* Handle the error in an appropriate way such as displaying a message or writing to a log file. */
-       /* In this simple program, we'll just leave */
-       free(shaderProgramInfoLog);
-       return;
-    }
-
-    /* Load the shader into the rendering pipeline */
-    glUseProgram(shaderprogram);
-
+    
     /* Loop our display increasing the number of shown vertexes each time.
      * Start with 2 vertexes (a line) and increase to 3 (a triangle) and 4 (a diamond) */
     for (i=2; i <= 4; i++)
@@ -253,16 +170,16 @@ void drawscene()
     }
 
     /* Cleanup all the things we bound and allocated */
-    glUseProgram(0);
-    glDisableVertexAttribArray(0);
-    glDisableVertexAttribArray(1);
-    glDetachShader(shaderprogram, vertexshader);
-    glDetachShader(shaderprogram, fragmentshader);
-    glDeleteProgram(shaderprogram);
-    glDeleteShader(vertexshader);
-    glDeleteShader(fragmentshader);
-    glDeleteBuffers(2, vbo);
-    glDeleteVertexArrays(1, &vao);
+    //glUseProgram(0);
+    //glDisableVertexAttribArray(0);
+    //glDisableVertexAttribArray(1);
+    //glDetachShader(shaderprogram, vertexshader);
+    //glDetachShader(shaderprogram, fragmentshader);
+    //glDeleteProgram(shaderprogram);
+    //glDeleteShader(vertexshader);
+    //glDeleteShader(fragmentshader);
+    //glDeleteBuffers(2, vbo);
+    //glDeleteVertexArrays(1, &vao);
 
 }
 
@@ -279,6 +196,9 @@ int main(int argc, char *argv[])
 {
     GTech::SDLInitialization();
     std::cout << "GL SHADING LANGUAGE VERSION: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << " " << glGetString(GL_VERSION) << std::endl; 
+
+    //Load Shaders.
+    InitScene();
 
     /* Call our function that performs opengl operations */
     drawscene();

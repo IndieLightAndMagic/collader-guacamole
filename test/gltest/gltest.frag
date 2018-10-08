@@ -1,4 +1,4 @@
-#version 410 core
+#version 330 core
 // It was expressed that some drivers required this next line to function properly
 precision highp float;
 
