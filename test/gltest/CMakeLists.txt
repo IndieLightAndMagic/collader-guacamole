@@ -54,6 +54,6 @@ target_link_libraries(${TARGET_NAME}
 
 target_link_libraries(${PROJECT_NAME}
 		"-framework Carbon" "-framework ForceFeedback" "-framework IOKit" "-framework Cocoa" "-framework CoreVideo"
-		"-framework AudioToolbox" "-framework CoreAudio" "-framework Foundation" "-framework AppKit" "-framework GLUT" 
+		"-framework AudioToolbox" "-framework CoreAudio" "-framework CoreFoundation" "-framework AppKit"  
 		"-framework OpenGL")
 

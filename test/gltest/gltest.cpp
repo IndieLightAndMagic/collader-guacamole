@@ -1,7 +1,8 @@
 #include <cstdlib>
 #include <cstdio>
 #include <string>
-
+#include <iostream>
+#include <vector>
 
 #ifdef __APPLE__
 #include <OpenGL/gl3.h>
@@ -14,27 +15,50 @@
 #include <SDLWrapper/sdlwrapper.h>
 
 /* A simple function that will read a file into an allocated char pointer buffer */
-char* filetobuf(const char *file)
+std::vector<char> filetobuf(const char *file)
 {
+
     FILE *fptr;
     long length;
-    char *buf;
 
     fptr = fopen(file, "rb"); /* Open file for reading */
+    
     if (!fptr) /* Return NULL on failure */
-        return NULL;
+        return std::vector<char>{};
+
     fseek(fptr, 0, SEEK_END); /* Seek to the end of the file */
     length = ftell(fptr); /* Find out how many bytes into the file we are */
-    buf = (char*)malloc(length+1); /* Allocate a buffer for the entire length of the file and a null terminator */
+    
+    auto buffer = std::vector<char>{};
+    buffer.reserve(length+1);
+        
     fseek(fptr, 0, SEEK_SET); /* Go back to the beginning of the file */
-    fread(buf, length, 1, fptr); /* Read the contents of the file in to the buffer */
+    for (auto idx = 0; idx < length; ++idx){
+        auto buf = char{}, *pbuf = &buf;
+        fread(pbuf, 1, 1, fptr); /* Read the contents of the file in to the buffer */
+        buffer.push_back(buf);
+    }
     fclose(fptr); /* Close the file */
-    buf[length] = 0; /* Null terminator */
+    buffer.data()[length] = 0;
 
-    return buf; /* Return the buffer */
+
+    return buffer; /* Return the buffer */
+
 }
+void PrintShader(std::string msg, std::vector<char> buffer) {
 
+    std::cout << msg <<  ":" <<  std::endl;
+    for (auto pAux = buffer.data(); *pAux; ++pAux){
+        std::cout << *pAux;
+    }
+    std::cout << std::endl;
 
+}
+void ErrorMessage(std::string msg) {
+
+    std::cout << ">>>>>>>>\n" << msg <<  "<<<<<<<<< " <<  std::endl;
+
+}
 void drawscene()
 {
     int i; /* Simple iterator */
@@ -60,8 +84,7 @@ void drawscene()
     {  1.0,  1.0,  1.0  } }; /* White */
 
     /* These pointers will receive the contents of our shader source code files */
-    GLchar *vertexsource, *fragmentsource;
-
+    
     /* These are handles used to reference the shaders */
     GLuint vertexshader, fragmentshader;
 
@@ -104,8 +127,10 @@ void drawscene()
     glEnableVertexAttribArray(1);
 
     /* Read our shaders into the appropriate buffers */
-    vertexsource = filetobuf(std::string{"../gltest.vert"}.c_str());
-    fragmentsource = filetobuf(std::string{"../gltest.frag"}.c_str());
+    auto vertexsource = filetobuf("../gltest.vert");
+    auto fragmentsource = filetobuf("../gltest.frag");
+    auto vertexsourcedata = vertexsource.data();
+    auto fragmentsourcedata = fragmentsource.data();
 
     /* Create an empty vertex shader handle */
     vertexshader = glCreateShader(GL_VERTEX_SHADER);
@@ -113,7 +138,8 @@ void drawscene()
     /* Send the vertex shader source code to GL */
     /* Note that the source code is NULL character terminated. */
     /* GL will automatically detect that therefore the length info can be 0 in this case (the last parameter) */
-    glShaderSource(vertexshader, 1, (const GLchar**)&vertexsource, 0);
+    PrintShader("Vertex", vertexsource);
+    glShaderSource(vertexshader, 1, (const GLchar**)&vertexsourcedata, 0);
 
     /* Compile the vertex shader */
     glCompileShader(vertexshader);
@@ -127,6 +153,7 @@ void drawscene()
        vertexInfoLog = (char *)malloc(maxLength);
 
        glGetShaderInfoLog(vertexshader, maxLength, &maxLength, vertexInfoLog);
+       ErrorMessage(std::string{vertexInfoLog});
 
        /* Handle the error in an appropriate way such as displaying a message or writing to a log file. */
        /* In this simple program, we'll just leave */
@@ -154,6 +181,7 @@ void drawscene()
        fragmentInfoLog = (char *)malloc(maxLength);
 
        glGetShaderInfoLog(fragmentshader, maxLength, &maxLength, fragmentInfoLog);
+       ErrorMessage(std::string{fragmentInfoLog});
 
        /* Handle the error in an appropriate way such as displaying a message or writing to a log file. */
        /* In this simple program, we'll just leave */
@@ -196,7 +224,7 @@ void drawscene()
 
        /* Notice that glGetProgramInfoLog, not glGetShaderInfoLog. */
        glGetProgramInfoLog(shaderprogram, maxLength, &maxLength, shaderProgramInfoLog);
-
+       ErrorMessage(std::string{shaderProgramInfoLog});
        /* Handle the error in an appropriate way such as displaying a message or writing to a log file. */
        /* In this simple program, we'll just leave */
        free(shaderProgramInfoLog);
@@ -235,8 +263,7 @@ void drawscene()
     glDeleteShader(fragmentshader);
     glDeleteBuffers(2, vbo);
     glDeleteVertexArrays(1, &vao);
-    free(vertexsource);
-    free(fragmentsource);
+
 }
 
 void destroywindow()
@@ -251,6 +278,7 @@ void destroywindow()
 int main(int argc, char *argv[])
 {
     GTech::SDLInitialization();
+    std::cout << "GL SHADING LANGUAGE VERSION: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << " " << glGetString(GL_VERSION) << std::endl; 
 
     /* Call our function that performs opengl operations */
     drawscene();
