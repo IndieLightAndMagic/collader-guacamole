@@ -1,7 +1,8 @@
+#include <iostream>
+#include <utility>
 #include <cstdlib>
 #include <cstdio>
 #include <string>
-#include <iostream>
 #include <vector>
 
 #ifdef __APPLE__
@@ -19,35 +20,65 @@
 
 /* A simple function that will read a file into an allocated char pointer buffer */
 GTech::Program GetShaders();
+
 struct VtxEntry {
 
-    std::string                 name;
-    unsigned int                 vao;
-    std::vector<unsigned int>    vbo;
+    std::string                 name{};
 
+    std::vector<unsigned int>    vao{};
+    std::vector<unsigned int>   ebos{};
+    std::vector<unsigned int>   vbos{};
 }; 
 
+
+std::pair<std::string, std::shared_ptr<VtxEntry>> GetVtxs(const GTech::Mesh& mesh){
+    
+    auto vtxentry = VtxEntry{};
+    
+    /* Get the number of "triangle-composites" */ 
+    auto nTriangleComposites = mesh.triangleArray.size();
+
+    /* For each <triangles/> collada element generate a vao */
+    vtxentry.vao.reserve(nTriangleComposites);
+    glGenVertexArrays(nTriangleComposites, vtxentry.vao.data());
+
+    for (auto& vao : vtxentry.vao){
+
+        glBindVertexArray(vao);
+        for(auto& triangleCompositePtr : mesh.triangleArray){
+            
+            unsigned int vbo, ebo;
+            glGenBuffers(1, &vbo);
+            glGenBuffers(1, &ebo);
+            vtxentry.ebos.push_back(ebo);
+            vtxentry.vbos.push_back(vbo);
+
+            glBindBuffer(GL_ARRAY_BUFFER, vbo);
+            glBufferData(GL_ARRAY_BUFFER, sizeof(float) * mesh.floatVector.size(), , GLenum usage)
+
+
+
+
+        }
+
+    }
+
+    
+
+
+    
+
+    return std::make_pair(std::string{}, std::make_shared<VtxEntry>());
+}
 void drawscene(const GTech::Scene& rScene)
 {
-    int i; /* Simple iterator */
-    GLuint vao, vbo[2]; /* Create handles for our Vertex Array Object and two Vertex Buffer Objects */
-    int isCompiled_VS, isCompiled_FS;
-    int IsLinked;
-    int maxLength;
-    char *vertexInfoLog;
-    char *fragmentInfoLog;
-    char *shaderProgramInfoLog;
-
-
-
-
+    int i; /* Simple iterator */    GLuint vao, vbo[2]; /* Create handles for our Vertex Array Object and two Vertex Buffer Objects */    int isCompiled_VS, isCompiled_FS;    int IsLinked;    int maxLength;    char *vertexInfoLog;    char *fragmentInfoLog;    char *shaderProgramInfoLog;
     /* We're going to create a simple diamond made from lines */
     const GLfloat diamond[4][2] = {
     {  0.0,  1.0  }, /* Top point */
     {  1.0,  0.0  }, /* Right point */
     {  0.0, -1.0  }, /* Bottom point */
     { -1.0,  0.0  } }; /* Left point */
-
     const GLfloat colors[4][3] = {
     {  1.0,  0.0,  0.0  }, /* Red */
     {  0.0,  1.0,  0.0  }, /* Green */
