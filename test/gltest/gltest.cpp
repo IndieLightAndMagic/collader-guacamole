@@ -12,75 +12,22 @@
 #endif /*__APPLE__*/
 
 
+
 #include <SDLWrapper/sdlwrapper.h>
 #include <ShaderMan/shdr.h>
+#include <collader/collader.h>
 
 /* A simple function that will read a file into an allocated char pointer buffer */
-std::vector<char> filetobuf(const char *file)
-{
+GTech::Program GetShaders();
+struct VtxEntry {
 
-    FILE *fptr;
-    long length;
+    std::string                 name;
+    unsigned int                 vao;
+    std::vector<unsigned int>    vbo;
 
-    fptr = fopen(file, "rb"); /* Open file for reading */
-    
-    if (!fptr) /* Return NULL on failure */
-        return std::vector<char>{};
+}; 
 
-    fseek(fptr, 0, SEEK_END); /* Seek to the end of the file */
-    length = ftell(fptr); /* Find out how many bytes into the file we are */
-    
-    auto buffer = std::vector<char>{};
-    buffer.reserve(length+1);
-        
-    fseek(fptr, 0, SEEK_SET); /* Go back to the beginning of the file */
-    for (auto idx = 0; idx < length; ++idx){
-        auto buf = char{}, *pbuf = &buf;
-        fread(pbuf, 1, 1, fptr); /* Read the contents of the file in to the buffer */
-        buffer.push_back(buf);
-    }
-    fclose(fptr); /* Close the file */
-    buffer.data()[length] = 0;
-
-
-    return buffer; /* Return the buffer */
-
-}
-void PrintShader(std::string msg, std::vector<char> buffer) {
-
-    std::cout << msg <<  ":" <<  std::endl;
-    for (auto pAux = buffer.data(); *pAux; ++pAux){
-        std::cout << *pAux;
-    }
-    std::cout << std::endl;
-
-}
-void ErrorMessage(std::string msg) {
-
-    std::cout << ">>>>>>>>" << std::endl << msg <<  "<<<<<<<<<" <<  std::endl;
-
-}
-GTech::Program InitScene() {
-
-    auto vtxShaderSrc = GTech::ShaderSource("../gltest.vert");
-    auto vtxShader    = GTech::Shader(&vtxShaderSrc, GL_VERTEX_SHADER);
-    
-    auto frgShaderSrc = GTech::ShaderSource("../gltest.frag");
-    auto frgShader    = GTech::Shader(&frgShaderSrc, GL_FRAGMENT_SHADER);
-
-    auto program = GTech::Program();
-    program.pushShader(&vtxShader);
-    program.pushShader(&frgShader);
-
-    program.link();
-
-    auto programIsLinked = program.isLinked();
-
-    return program; 
-
-}
-
-void drawscene()
+void drawscene(const GTech::Scene& rScene)
 {
     int i; /* Simple iterator */
     GLuint vao, vbo[2]; /* Create handles for our Vertex Array Object and two Vertex Buffer Objects */
@@ -90,6 +37,9 @@ void drawscene()
     char *vertexInfoLog;
     char *fragmentInfoLog;
     char *shaderProgramInfoLog;
+
+
+
 
     /* We're going to create a simple diamond made from lines */
     const GLfloat diamond[4][2] = {
@@ -145,7 +95,7 @@ void drawscene()
     glEnableVertexAttribArray(1);
 
     /* Get GPU Program */
-    auto shaderprogram = InitScene();
+    auto shaderprogram = GetShaders();
     shaderprogram.use();
     
     
@@ -182,6 +132,91 @@ void drawscene()
     //glDeleteVertexArrays(1, &vao);
 
 }
+void PrintShader(std::string msg, std::vector<char> buffer) {
+
+    std::cout << msg <<  ":" <<  std::endl;
+    for (auto pAux = buffer.data(); *pAux; ++pAux){
+        std::cout << *pAux;
+    }
+    std::cout << std::endl;
+}
+void ErrorMessage(std::string msg) {
+
+    std::cout << ">>>>>>>>" << std::endl << msg <<  "<<<<<<<<<" <<  std::endl;
+}
+
+GTech::Program GetShaders() {
+
+    auto vtxShaderSrc = GTech::ShaderSource("../gltest.vert");
+    auto vtxShader    = GTech::Shader(&vtxShaderSrc, GL_VERTEX_SHADER);
+    
+    auto frgShaderSrc = GTech::ShaderSource("../gltest.frag");
+    auto frgShader    = GTech::Shader(&frgShaderSrc, GL_FRAGMENT_SHADER);
+
+    auto program = GTech::Program();
+    program.pushShader(&vtxShader);
+    program.pushShader(&frgShader);
+
+    program.link();
+
+    auto programIsLinked = program.isLinked();
+
+    return program; 
+}
+std::vector<char> filetobuf(const char *file){
+
+    FILE *fptr;
+    long length;
+
+    fptr = fopen(file, "rb"); /* Open file for reading */
+    
+    if (!fptr) /* Return NULL on failure */
+        return std::vector<char>{};
+
+    fseek(fptr, 0, SEEK_END); /* Seek to the end of the file */
+    length = ftell(fptr); /* Find out how many bytes into the file we are */
+    
+    auto buffer = std::vector<char>{};
+    buffer.reserve(length+1);
+        
+    fseek(fptr, 0, SEEK_SET); /* Go back to the beginning of the file */
+    for (auto idx = 0; idx < length; ++idx){
+        auto buf = char{}, *pbuf = &buf;
+        fread(pbuf, 1, 1, fptr); /* Read the contents of the file in to the buffer */
+        buffer.push_back(buf);
+    }
+    fclose(fptr); /* Close the file */
+    buffer.data()[length] = 0;
+
+
+    return buffer; /* Return the buffer */
+}
+
+GTech::Scene GetScene(std::string path){
+
+    tinyxml2::XMLDocument doc;
+    auto result = doc.LoadFile(path.c_str());
+
+    if ( result != tinyxml2::XML_SUCCESS){
+
+        std::cout << "Returning an empty Scene.... Couldn't load collada file.... \n";
+        return GTech::Scene{};
+    
+    } else {
+
+        std::cout << "Ok scene file was successfully loaded.... \n"; 
+
+    }
+
+    GTech::ColladaVisitor visitor;
+    auto pVisitor = &visitor;
+    doc.Accept(pVisitor);
+    auto aScene = visitor.GetScene();
+
+    std::cout << "Scene name is: " << aScene.name << std::endl;
+
+    return aScene;
+}
 
 void destroywindow()
 {
@@ -196,12 +231,29 @@ int main(int argc, char *argv[])
 {
     GTech::SDLInitialization();
     std::cout << "GL SHADING LANGUAGE VERSION: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << " " << glGetString(GL_VERSION) << std::endl; 
+    std::cout << "Resource directory: " << RESOURCES_DIR << std::endl; 
+    
+    auto daePath = std::string{RESOURCES_DIR} + std::string{"/simple.dae"};
+    auto scene   = GetScene(daePath);
 
-    //Load Shaders.
-    InitScene();
+    for (auto&nodekey_nodeptr : scene.nodes){
+
+        auto nodeptr = nodekey_nodeptr.second;
+        std::cout << "Node: " << nodeptr->name << " -- ";
+        if (nodeptr->nodeType == GTech::Node::NodeType::MESH) std::cout << "MESH";
+        if (nodeptr->nodeType == GTech::Node::NodeType::LIGHT) std::cout << "LIGHT";
+        if (nodeptr->nodeType == GTech::Node::NodeType::CAMERA) std::cout << "CAMERA";
+        std::cout << std::endl;
+
+        if (nodeptr->nodeType == GTech::Node::NodeType::MESH){
+
+            auto meshptr = std::dynamic_pointer_cast<GTech::Mesh>(nodeptr);
+        } 
+
+    }
 
     /* Call our function that performs opengl operations */
-    drawscene();
+    drawscene(scene);
 
     /* Delete our opengl context, destroy our window, and shutdown SDL */
     destroywindow();
