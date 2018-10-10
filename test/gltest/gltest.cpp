@@ -23,52 +23,77 @@ GTech::Program GetShaders();
 
 struct VtxEntry {
 
-    std::string                 name{};
-
     std::vector<unsigned int>    vao{};
     std::vector<unsigned int>   ebos{};
     std::vector<unsigned int>   vbos{};
+
 }; 
 
 
-std::pair<std::string, std::shared_ptr<VtxEntry>> GetVtxs(const GTech::Mesh& mesh){
+std::shared_ptr<VtxEntry> GetVtxs(const GTech::Mesh& mesh){
     
-    auto vtxentry = VtxEntry{};
-    
+    /* Get Vtxs */
+    auto meshdata            = mesh.floatVector.data();
+    auto meshdatasize        = mesh.floatVector.size() * sizeof(float);
+    auto vtxentry            = std::make_shared<VtxEntry>();
+
     /* Get the number of "triangle-composites" */ 
     auto nTriangleComposites = mesh.triangleArray.size();
 
     /* For each <triangles/> collada element generate a vao */
-    vtxentry.vao.reserve(nTriangleComposites);
-    glGenVertexArrays(nTriangleComposites, vtxentry.vao.data());
+    vtxentry->vao.reserve(nTriangleComposites);
+    glGenVertexArrays(nTriangleComposites, vtxentry->vao.data());
 
-    for (auto& vao : vtxentry.vao){
 
-        glBindVertexArray(vao);
-        for(auto& triangleCompositePtr : mesh.triangleArray){
+    for (auto index = 0; index < nTriangleComposites; ++index){
+
+        unsigned int vbo, ebo;
+        auto pTriangleCompositeRaw = mesh.triangleArray[index].get();
+        auto indexdata             = pTriangleCompositeRaw->indexArray.data();
+        auto indexdatasize         = pTriangleCompositeRaw->indexArray.size() * sizeof(unsigned int);
+
+        glBindVertexArray(vtxentry->vao[index]);
+
+        glGenBuffers(1, &vbo);
+        glGenBuffers(1, &ebo);
+        
+        vtxentry->ebos.push_back(ebo);
+        vtxentry->vbos.push_back(vbo);
+
+        glBindBuffer(GL_ARRAY_BUFFER, vbo);
+        glBufferData(GL_ARRAY_BUFFER, meshdatasize, meshdata, GL_STATIC_DRAW);
+
+        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
+        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexdatasize, indexdata, GL_STATIC_DRAW);
+
+        for (auto& input : pTriangleCompositeRaw->meshTrianglesInput){
             
-            unsigned int vbo, ebo;
-            glGenBuffers(1, &vbo);
-            glGenBuffers(1, &ebo);
-            vtxentry.ebos.push_back(ebo);
-            vtxentry.vbos.push_back(vbo);
+            /* <input/> */
+            unsigned int vertexAttributeId;
+            
+            auto offset      = input.offset;
+            auto pOffset     = &meshdata[offset];
+            auto source      = input.source;
+            auto map         = mesh.meshSourceMap;
+            auto pMeshSource = map[source];
+            auto stride      = pMeshSource->stride;
 
-            glBindBuffer(GL_ARRAY_BUFFER, vbo);
-            glBufferData(GL_ARRAY_BUFFER, sizeof(float) * mesh.floatVector.size(), , GLenum usage)
+            if (input.semanticType == GTech::MeshTrianglesInput::DataType::TEXCOORD){
+                vertexAttributeId = 2;
+            } else if (input.semanticType == GTech::MeshTrianglesInput::DataType::NORMAL){
+                vertexAttributeId = 1;
+            } else if (input.semanticType == GTech::MeshTrianglesInput::DataType::VERTEX){
+                vertexAttributeId = 0;
+            }
 
-
-
+            glVertexAttribPointer(vertexAttributeId, stride, GL_FLOAT, GL_FALSE, stride*sizeof(GLfloat), pOffset);
+            glEnableVertexAttribArray(vertexAttributeId);
 
         }
-
+        
     }
 
-    
-
-
-    
-
-    return std::make_pair(std::string{}, std::make_shared<VtxEntry>());
+    return vtxentry;
 }
 void drawscene(const GTech::Scene& rScene)
 {
