@@ -48,10 +48,14 @@ target_include_directories(${TARGET_NAME} PUBLIC ${GTECH_DIR_INC})
 
 #========== LINK ================#
 
-target_link_libraries(${TARGET_NAME} 
-	${GTECH_DIR_LIB}/libcollader.a ${GTECH_DIR_LIB}/libsdlwrapper.a ${GTECH_DIR_LIB}/libSDL2d.a
-	${GTECH_DIR_LIB}/libShaderMan.a 
-	${GTECH_DIR_LIB}/SDL2_image.framework/SDL2_image "-liconv" "-lm")
+target_link_libraries(${TARGET_NAME}
+	${GTECH_DIR_LIB}/libcollader.a
+	${GTECH_DIR_LIB}/libsdlwrapper.a
+	${GTECH_DIR_LIB}/libSDL_image.a
+	${GTECH_DIR_LIB}/libSDL2.a
+	${GTECH_DIR_LIB}/libShaderMan.a
+	"-liconv"
+	"-lm")
 
 get_filename_component(COLLADER_TEST_RESOURCE ${ROOT_DIR}/../resources ABSOLUTE)
 target_compile_definitions(${TARGET_NAME} PUBLIC RESOURCES_DIR="${COLLADER_TEST_RESOURCE}")
