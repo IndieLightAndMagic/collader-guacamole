@@ -106,9 +106,15 @@ void drawscene(const GTech::Scene& rScene)
 
     for (auto& meshname_mesh : rScene.meshes){
 
-        auto meshname = meshname_mesh.first;
-        auto mesh     = meshname_mesh.second;
+        const auto meshname = meshname_mesh.first;
+        const auto pmesh    = meshname_mesh.second;
+
+        /* Get OpenGl graphics indexed data */
+        auto pGraphicsIndexedData = GetVtxs(*pmesh);
         
+
+        
+
     }
 
     
