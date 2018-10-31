@@ -8,7 +8,7 @@ using namespace std;
 
 std::shared_ptr<GTech::Effect> pShaderTmp = nullptr;
 bool GTech::ColladaVisitor::VisitExit_library_effects(const XMLElement& e){
-
+    
     return true;
 
 }
@@ -68,9 +68,17 @@ bool GTech::ColladaVisitor::VisitEnter_library_effects(const XMLElement& e, cons
 
             pShaderTmp->reflective = colorVector;
 
-        }
+        } 
 
 
+    } else if (eName == "source"){
+        
+
+    } else if (eName == "texture") {
+
+        auto attrMap = GetAttrMap(pa);
+        pShaderTmp->textureUrl = std::string{attrMap["texture"]};
+    
     } else if (pShaderTmp->shadertypemap.find(eName) != pShaderTmp->shadertypemap.end()) {
 
         pShaderTmp->shaderType = pShaderTmp->shadertypemap[eName];

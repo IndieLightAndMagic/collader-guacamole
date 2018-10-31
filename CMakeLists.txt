@@ -1,7 +1,6 @@
 #CMAKE TO MAKE A STATIC LIBRARY
 #HEADER
 cmake_minimum_required(VERSION 3.9.0 FATAL_ERROR)
-set(CMAKE_VERBOSE_MAKEFILE ON)
 set(TARGET_NAME collader)
 project(${TARGET_NAME})
 set(CMAKE_CXX_STANDARD 17)
@@ -43,8 +42,11 @@ add_library(${TARGET_NAME} STATIC
     node.cpp
     scene.cpp
     glcollader.cpp
+    newparam.cpp
 
 )
+set(CMAKE_VERBOSE_MAKEFILE TRUE)
+set(CMAKE_BUILD_TYPE debug)
 target_include_directories(${TARGET_NAME} PUBLIC ${GLM_DIR})
 
 file(MAKE_DIRECTORY ${GTECH_DIR})

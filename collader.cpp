@@ -5,6 +5,13 @@
 using namespace tinyxml2;
 using namespace std;
 
+
+std::tuple<std::string, std::string, const char*> GTech::ColladaVisitor::GetNameParentText(const tinyxml2::XMLElement& e){
+
+    return std::make_tuple(std::string{e.Name()}, GetParentName(e), e.GetText());
+
+}
+
 std::string GTech::ColladaVisitor::GetElementText(const XMLElement& e){
 
     auto eText = e.GetText();
@@ -13,18 +20,25 @@ std::string GTech::ColladaVisitor::GetElementText(const XMLElement& e){
 
 }
 
+std::string GTech::ColladaVisitor::GetParentName(const XMLElement &e){
+
+    //Get Parent dict
+    return std::string{reinterpret_cast<const tinyxml2::XMLElement*>(e.Parent())->Name()};
+
+}
 
 bool GTech::ColladaVisitor::VisitEnter(const XMLElement& e, const XMLAttribute* pa){
     
     auto eName                      = std::string{e.Name()};
     auto eNameSearchForVisitorState = stateMap.find(eName);
     auto eNameStateFound            = eNameSearchForVisitorState != stateMap.end();
-    
+    auto& visitorState              = visitorStateDq.front();
+
 
     if  ( eNameStateFound ){
 
         auto& visitorStateName = eName;
-        visitorState = stateMap[visitorStateName];
+        visitorStateDq.push_front(stateMap[visitorStateName]) ;
 
     } else if (visitorState == ColladaVisitor::VisitorState::library_effects){
 
@@ -71,7 +85,11 @@ bool GTech::ColladaVisitor::VisitEnter(const XMLElement& e, const XMLAttribute* 
         auto z_up = GetElementText(e);
         aScene.z_up = z_up == "Z_UP" ? true : false;
 
-    } 
+    } else if (visitorState == ColladaVisitor::VisitorState::newparam){
+
+        return VisitEnter_newparam(e, pa);        
+
+    }
 
      
 
@@ -80,38 +98,49 @@ bool GTech::ColladaVisitor::VisitEnter(const XMLElement& e, const XMLAttribute* 
 
 bool GTech::ColladaVisitor::VisitExit(const XMLElement& e){
 
-    auto eName = std::string{e.Name()};
+    auto eName         = std::string{e.Name()};
+    auto& visitorState = visitorStateDq.front();
+    auto retValue      = true;
 
     if (visitorState == ColladaVisitor::VisitorState::library_geometries){
 
-        return VisitExit_library_geometries(e);
+        retValue       = VisitExit_library_geometries(e);
 
     } else if (visitorState == ColladaVisitor::VisitorState::library_cameras){
 
-        return VisitExit_library_cameras(e);
+        retValue       = VisitExit_library_cameras(e);
 
     } else if (visitorState == ColladaVisitor::VisitorState::library_images){
 
-        return VisitExit_library_images(e);
+        retValue       = VisitExit_library_images(e);
 
     } else if (visitorState == ColladaVisitor::VisitorState::library_effects){
 
-        return VisitExit_library_effects(e);
+        retValue       = VisitExit_library_effects(e);
 
     } else if (visitorState == ColladaVisitor::VisitorState::library_lights){
 
-        return VisitExit_library_lights(e);
+        retValue       = VisitExit_library_lights(e);
 
     } else if (visitorState == ColladaVisitor::VisitorState::library_materials){
 
-        return VisitExit_library_materials(e);
+        retValue       = VisitExit_library_materials(e);
 
     } else if (visitorState == ColladaVisitor::VisitorState::library_visual_scenes){
 
-        return VisitExit_library_visual_scenes(e);
+        retValue       = VisitExit_library_visual_scenes(e);
     }
 
-    return true;
+    auto eNameSearchForVisitorState = stateMap.find(eName);
+    auto eNameStateFound            = eNameSearchForVisitorState != stateMap.end();
+
+    if (eNameStateFound){
+
+        visitorStateDq.pop_front();
+
+    }
+
+    return retValue;
 }
 
 

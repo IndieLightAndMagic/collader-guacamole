@@ -40,7 +40,7 @@ bool GTech::ColladaVisitor::VisitEnter_library_geometries(const tinyxml2::XMLEle
         pMeshSourceTmp                          = std::make_shared<GTech::MeshSource>();
         pMeshTmp->meshSourceMap[attrMap["id"]]  = pMeshSourceTmp;
 
-    } else if (eName == "accesor") {
+    } else if (eName == "accessor") {
 
         std::stringstream{std::string{attrMap["count"]}}    >> pMeshSourceTmp->pointsCount;
         std::stringstream{std::string{attrMap["stride"]}}   >> pMeshSourceTmp->stride;

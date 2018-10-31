@@ -4,10 +4,10 @@ using namespace GTech;
 void IdName::SetIdName(const tinyxml2::XMLAttribute *pa){
 
 	assert(pa != nullptr);
-	if (pa) id = pa->Value();
+	id = pa->Value(); //Get Id Attribute
 	auto next = pa->Next();
 	assert(next != nullptr);
-	if (next) name = next->Value();
+	if (next) name = next->Value(); //Get Name Attribute
 
 }
         

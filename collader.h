@@ -8,10 +8,12 @@
 #include <string>
 #include <cassert>
 #include <iostream>
-#include <map>
 #include <sstream>
 #include <utility>
 #include <vector>
+#include <deque>
+#include <tuple>
+#include <map>
 
 #include "scene.h"
 namespace GTech {
@@ -32,6 +34,7 @@ namespace GTech {
             library_geometries,
             library_controllers,
             library_visual_scenes,
+            newparam,
             scene
         };
     private:
@@ -41,7 +44,6 @@ namespace GTech {
 
         std::map<std::string, ColladaVisitor::VisitorState > stateMap {
             
-            std::make_pair("none",                  ColladaVisitor::VisitorState::none),
             std::make_pair("asset",                 ColladaVisitor::VisitorState::asset),
             std::make_pair("library_cameras",       ColladaVisitor::VisitorState::library_cameras),
             std::make_pair("library_lights",        ColladaVisitor::VisitorState::library_lights),
@@ -51,6 +53,8 @@ namespace GTech {
             std::make_pair("library_geometries",    ColladaVisitor::VisitorState::library_geometries),
             std::make_pair("library_controllers",   ColladaVisitor::VisitorState::library_controllers),
             std::make_pair("library_visual_scenes", ColladaVisitor::VisitorState::library_visual_scenes),
+            std::make_pair("none",                  ColladaVisitor::VisitorState::none),
+            std::make_pair("newparam",              ColladaVisitor::VisitorState::newparam),
             std::make_pair("scene",                 ColladaVisitor::VisitorState::scene)
         
         };
@@ -62,6 +66,7 @@ namespace GTech {
         bool VisitEnter_library_cameras(const tinyxml2::XMLElement& e, const tinyxml2::XMLAttribute* pa);
         bool VisitEnter_library_lights(const tinyxml2::XMLElement &e, const tinyxml2::XMLAttribute *pa);
         bool VisitEnter_library_visual_scenes(const tinyxml2::XMLElement &e, const tinyxml2::XMLAttribute *pa);
+        bool VisitEnter_newparam(const tinyxml2::XMLElement &e, const tinyxml2::XMLAttribute *pa);
 
         bool VisitExit_library_geometries(const tinyxml2::XMLElement& e);
         bool VisitExit_library_images(const tinyxml2::XMLElement& e);
@@ -70,6 +75,7 @@ namespace GTech {
         bool VisitExit_library_effects(const tinyxml2::XMLElement& e);
         bool VisitExit_library_lights(const tinyxml2::XMLElement &e);
         bool VisitExit_library_visual_scenes(const tinyxml2::XMLElement &e);
+        bool VisitExit_newparam(const tinyxml2::XMLElement &e);
 
         template <typename T>
         std::shared_ptr<T> CreateElement(const tinyxml2::XMLAttribute* pa){
@@ -88,7 +94,7 @@ namespace GTech {
     public:
         
 
-        VisitorState visitorState{VisitorState::none};
+        std::deque<VisitorState> visitorStateDq{VisitorState::none};
         bool VisitEnter(const tinyxml2::XMLElement& e, const tinyxml2::XMLAttribute* pa);
         bool VisitExit(const tinyxml2::XMLElement& e);
                 
@@ -115,17 +121,13 @@ namespace GTech {
 
         std::string GetElementText(const tinyxml2::XMLElement& e);
 
-        std::string GetParentName(const tinyxml2::XMLElement& e){
-
-            //Get Parent dict
-            return std::string{reinterpret_cast<const tinyxml2::XMLElement*>(e.Parent())->Name()};
-            
-        }
-        
+        std::string GetParentName(const tinyxml2::XMLElement& e);        
 
         const Scene& GetScene(){
             return aScene;
         }
+
+        std::tuple<std::string, std::string, const char*> GetNameParentText(const tinyxml2::XMLElement& e);
 
         void PrintSceneInfo();
     };

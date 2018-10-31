@@ -6,10 +6,12 @@
 #include "glm/gtx/string_cast.hpp"
 
 #include <iostream>
+#include <memory>
 #include <string>
 #include <map>
 
 #include "idname.h"
+#include "material.h"
 
 namespace GTech {
 
@@ -33,7 +35,8 @@ namespace GTech {
         float					refractionIndex;
         Effect::ShaderType	    shaderType;
         std::string             imageId{};
-
+        std::string             textureUrl{};
+                    
     };
 
 

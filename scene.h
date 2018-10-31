@@ -16,10 +16,11 @@
 #include "effect.h"
 #include "image.h"
 #include "material.h"
-
+#include "newparam.h"
 
 
 namespace GTech {
+
 
     struct Scene : public GTech::IdName {
 
@@ -39,7 +40,7 @@ namespace GTech {
         std::map<std::string, std::shared_ptr<GTech::Effect>> shaders{};
         std::map<std::string, std::shared_ptr<GTech::Image>> images{};
         std::map<std::string, std::shared_ptr<GTech::Material>> materials{};
-        
+        std::map<std::string, std::shared_ptr<GTech::NewParam>> parameters{};
         std::map<std::string, std::shared_ptr<GTech::IdName>> urlPtrMap;
 
     };
