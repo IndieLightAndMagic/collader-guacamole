@@ -18,7 +18,6 @@
 #include "material.h"
 #include "newparam.h"
 
-
 namespace GTech {
 
 
@@ -44,6 +43,8 @@ namespace GTech {
         std::map<std::string, std::shared_ptr<GTech::IdName>> urlPtrMap;
 
     };
+
+
 
 
 }

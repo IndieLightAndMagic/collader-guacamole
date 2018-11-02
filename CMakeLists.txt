@@ -8,7 +8,8 @@ set(CMAKE_CXX_STANDARD 17)
 #Installation directory 
 get_filename_component(GTECH_DIR $ENV{GTECH_ROOT} ABSOLUTE)
 set(GTECH_DIR_LIB ${GTECH_DIR}/3rd/lib/)
-set(GTECH_DIR_INC ${GTECH_DIR}/3rd/include/collader)
+set(GTECH_DIR_INC ${GTECH_DIR}/3rd/include/)
+set(GTECH_DIR_INC_COLLADER ${GTECH_DIR}/3rd/include/collader)
 
 #DIRECTORIES
 get_filename_component(ROOT_DIR "." ABSOLUTE)
@@ -43,16 +44,20 @@ add_library(${TARGET_NAME} STATIC
     scene.cpp
     glcollader.cpp
     newparam.cpp
+    sceneresourcer.cpp
 
 )
 set(CMAKE_VERBOSE_MAKEFILE TRUE)
 set(CMAKE_BUILD_TYPE debug)
-target_include_directories(${TARGET_NAME} PUBLIC ${GLM_DIR})
+target_include_directories(${TARGET_NAME} PUBLIC 
+    ${GLM_DIR}
+    ${GTECH_DIR_INC}
+    )
 
 file(MAKE_DIRECTORY ${GTECH_DIR})
 file(MAKE_DIRECTORY ${GTECH_DIR_LIB})
-file(MAKE_DIRECTORY ${GTECH_DIR_INC})
-file(MAKE_DIRECTORY ${GTECH_DIR_INC}/tinyxml2)
+file(MAKE_DIRECTORY ${GTECH_DIR_INC_COLLADER})
+file(MAKE_DIRECTORY ${GTECH_DIR_INC_COLLADER}/tinyxml2)
 
 
 #POST BUILD COMMANDS 

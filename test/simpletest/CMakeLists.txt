@@ -1,7 +1,6 @@
 #CMAKE TO MAKE A STATIC LIBRARY
 #HEADER
 cmake_minimum_required(VERSION 3.9.0 FATAL_ERROR)
-set(CMAKE_VERBOSE_MAKEFILE ON)
 set(TARGET_NAME colladertest)
 project(${TARGET_NAME})
 set(CMAKE_CXX_STANDARD 17)
@@ -31,8 +30,10 @@ add_executable(${TARGET_NAME}
     colladertest.cpp
     
 )
+set(CMAKE_VERBOSE_MAKEFILE TRUE)
 
 target_include_directories(${TARGET_NAME} PUBLIC ${GLM_INC_DIR})
 target_include_directories(${TARGET_NAME} PUBLIC ${COLLADER_INC_DIR})
+target_include_directories(${TARGET_NAME} PUBLIC ${GTECH_DIR_INC})
 target_link_libraries(${TARGET_NAME} ${GTECH_DIR_LIB}/libcollader.a)
 
