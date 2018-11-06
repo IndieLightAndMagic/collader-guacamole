@@ -13,6 +13,7 @@ namespace GTech {
 	
 	struct IdName;
 	using IdMap = std::map<std::string, std::shared_ptr<GTech::IdName>>;
+    
     struct IdName {
         std::string id;
         std::string name;

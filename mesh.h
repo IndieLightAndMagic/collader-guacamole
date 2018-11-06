@@ -54,8 +54,7 @@ namespace GTech {
         std::map<std::string, std::shared_ptr<GTech::MeshSource>>   meshSourceMap{};
         std::vector<std::shared_ptr<GTech::MeshTriangles>>          triangleArray{};
         std::vector<float>                                          floatVector{};
-        
-        static unsigned int CreateVaoArrayComponent(const Mesh& rMesh, const GTech::IdMap& rMap);
+
     };
 
 }

@@ -22,20 +22,11 @@ namespace GTech{
             std::make_pair(std::string{"instance_light"},   GTech::Node::NodeType::LIGHT),
             std::make_pair(std::string{"instance_geometry"}, GTech::Node::NodeType::MESH)
         };
+        
         glm::mat4                           transform;
         std::string                         url{};
-        std::map<std::string, std::string>  instanced_materials{};
         Node::NodeType                      nodeType{};
 
-        
-        /**
-         * @brief      Create a matrix component.
-         *
-         * @param[in]  rNode  reference to the node containing the matrix for it.
-         *
-         * @return     An unsigned integer of the id of the matrix component.
-         */
-        static unsigned int CreateMatrixComponent(const Node& rNode);
         
     };
     

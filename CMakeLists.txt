@@ -44,7 +44,6 @@ add_library(${TARGET_NAME} STATIC
     scene.cpp
     glcollader.cpp
     newparam.cpp
-    sceneresourcer.cpp
 
 )
 set(CMAKE_VERBOSE_MAKEFILE TRUE)
