@@ -10,21 +10,27 @@ using namespace GTech;
 
 std::tuple<std::string, std::string> resourceNameResolution(std::string spath){
 
+    //Create Path
     auto path = GTech::filesystem::path{spath};
+
+    //Create a string to store the resource name
     std::string resourceName{};
+
+    //While the path doesn't exist and it is not empty:
     while (!path.exists() && !path.empty()){
-        std::cout << path << " does not exists! stripping: " << path.filename() << std::endl;
+        //Add path endpoint to the beginning of resourceName 
         resourceName = resourceName.empty() ? path.filename() : path.filename() + std::string{"/"} + resourceName;
+
+        //Strip the endpoint out of path
         path = path.parent_path();
     }
-    std::cout << "***\n"<< path << "\n***\n" << std::endl;
+
+    //If the path is empty or it doesn't exist return an empty string for the path and a resource name.
     if (path.empty() || !path.exists()){
-        std::cout << "Path never existed!!!!" << std::endl;
-        return std::make_tuple(std::string{}, std::string{});
+        return std::make_tuple(std::string{}, resourceName);
     }
-    std::cout << "Abs Path is " << path.make_absolute() << std::endl;
-    std::cout << "Rel Path is " << path << std::endl;
-    
+
+    //The path exists: return it and the resource name
     return std::make_tuple(path.str(), resourceName);
 
 }
@@ -32,9 +38,9 @@ std::tuple<std::string, std::string> resourceNameResolution(std::string spath){
 int main (){
 
 
-    auto path = std::string{"../../resources/simple.dae/Cube"};
+    auto path = std::string{"Cube"};
     auto [resourceFile, resourceName] = resourceNameResolution(path);
-    
+    std::cout << resourceFile << ", " << resourceName << std::endl; 
     XMLDocument doc;
     doc.LoadFile("../../resources/simple.dae");
 

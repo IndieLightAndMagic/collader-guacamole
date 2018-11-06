@@ -20,7 +20,6 @@
 
 namespace GTech {
 
-
     struct Scene : public GTech::IdName {
 
         bool z_up{false};

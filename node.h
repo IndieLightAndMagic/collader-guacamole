@@ -1,12 +1,14 @@
 #ifndef __NODE_H__
 #define __NODE_H__
 
-#include "glm/glm.hpp"
+#include <glm/glm.hpp>
 
 #include <iostream>
 #include <string>
 #include <vector>
 #include <map>
+
+#include <ECS/Component/componentmanager.h>
 
 #include "idname.h"
 
@@ -24,8 +26,20 @@ namespace GTech{
         std::string                         url{};
         std::map<std::string, std::string>  instanced_materials{};
         Node::NodeType                      nodeType{};
+
+        
+        /**
+         * @brief      Create a matrix component.
+         *
+         * @param[in]  rNode  reference to the node containing the matrix for it.
+         *
+         * @return     An unsigned integer of the id of the matrix component.
+         */
+        static unsigned int CreateMatrixComponent(const Node& rNode);
         
     };
+    
+
 }
 
 #endif

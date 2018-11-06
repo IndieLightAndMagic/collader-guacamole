@@ -7,6 +7,8 @@
 #include <map>
 #include <vector>
 
+#include <ECS/Component/componentmanager.h>
+
 #include "idname.h"
 
 namespace GTech {
@@ -53,6 +55,7 @@ namespace GTech {
         std::vector<std::shared_ptr<GTech::MeshTriangles>>          triangleArray{};
         std::vector<float>                                          floatVector{};
         
+        static unsigned int CreateVaoArrayComponent(const Mesh& rMesh, const GTech::IdMap& rMap);
     };
 
 }
