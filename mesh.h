@@ -25,7 +25,13 @@ namespace GTech {
 
     struct MeshTrianglesInput {
 
-        enum class DataType {NONE, TEXCOORD, NORMAL, VERTEX};
+        enum class DataType : unsigned int {
+            NONE = 0xFFFFFFFF,
+            COLOR = 0x03, 
+            TEXCOORD = 0x02, 
+            NORMAL = 0x01, 
+            VERTEX = 0x00
+        };
         GTech::MeshTrianglesInput::DataType	semanticType{MeshTrianglesInput::DataType::NONE};
         std::string                         source{};
         unsigned int                        offset{0};
