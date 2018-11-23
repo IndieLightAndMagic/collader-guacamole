@@ -1,9 +1,9 @@
 #CMAKE TO MAKE A STATIC LIBRARY
 #HEADER
 cmake_minimum_required(VERSION 3.9.0 FATAL_ERROR)
-set(CMAKE_VERBOSE_MAKEFILE ON)
 set(TARGET_NAME gltest)
 project(${TARGET_NAME})
+set(CMAKE_VERBOSE_MAKEFILE TRUE)
 set(CMAKE_CXX_STANDARD 17)
 
 #DIRECTORIES
@@ -36,6 +36,7 @@ add_executable(${TARGET_NAME}
     gltest.cpp
     
 )
+set(CMAKE_BUILD_TYPE Debug)
 
 
 
@@ -54,6 +55,7 @@ target_link_libraries(${TARGET_NAME}
 	${GTECH_DIR_LIB}/libSDL_image.a
 	${GTECH_DIR_LIB}/libSDL2.a
 	${GTECH_DIR_LIB}/libShaderMan.a
+	${GTECH_DIR_LIB}/libECS.a
 	"-liconv"
 	"-lm")
 

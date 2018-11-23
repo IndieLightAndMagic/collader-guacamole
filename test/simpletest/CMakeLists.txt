@@ -31,6 +31,8 @@ add_executable(${TARGET_NAME}
     
 )
 set(CMAKE_VERBOSE_MAKEFILE TRUE)
+set(CMAKE_BUILD_TYPE Debug)
+
 
 target_include_directories(${TARGET_NAME} PUBLIC ${GLM_INC_DIR})
 target_include_directories(${TARGET_NAME} PUBLIC ${COLLADER_INC_DIR})

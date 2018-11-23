@@ -13,7 +13,8 @@
 #endif /*__APPLE__*/
 
 
-
+#include <ECS/Entity/entitymanager.h>
+#include <ECS/System/sceneresourcer.h>
 #include <SDLWrapper/sdlwrapper.h>
 #include <ShaderMan/shdr.h>
 #include <collader/collader.h>
@@ -269,8 +270,15 @@ int main(int argc, char *argv[])
 
     }
 
+    auto resourcemanager = GTech::ResourceManager::GetInstance();
+    auto cubeid0 = resourcemanager.Load(daePath + std::string{"/Cube"});
+    auto camera0 = resourcemanager.Load(daePath + std::string{"/Camera"});
+    auto lamp0 = resourcemanager.Load(daePath + std::string{"/Lamp"});
+
+
+
     /* Call our function that performs opengl operations */
-    drawscene(scene);
+    //drawscene(scene);
 
     /* Delete our opengl context, destroy our window, and shutdown SDL */
     destroywindow();

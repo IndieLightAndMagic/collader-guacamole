@@ -47,7 +47,7 @@ add_library(${TARGET_NAME} STATIC
 
 )
 set(CMAKE_VERBOSE_MAKEFILE TRUE)
-set(CMAKE_BUILD_TYPE debug)
+set(CMAKE_BUILD_TYPE Debug)
 target_include_directories(${TARGET_NAME} PUBLIC 
     ${GLM_DIR}
     ${GTECH_DIR_INC}
