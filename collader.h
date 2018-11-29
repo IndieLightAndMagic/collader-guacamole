@@ -16,6 +16,7 @@
 #include <map>
 
 #include "scene.h"
+
 namespace GTech {
 
     class ColladaVisitor : public tinyxml2::XMLVisitor {
@@ -40,7 +41,7 @@ namespace GTech {
     private:
         
 
-        GTech::Scene aScene;
+        std::shared_ptr<GTech::Scene> aScene{std::make_shared<GTech::Scene>()};
 
         std::map<std::string, ColladaVisitor::VisitorState > stateMap {
             
@@ -85,7 +86,7 @@ namespace GTech {
             if ( p ) {
 
                 p->SetIdName(pa);
-                aScene.urlPtrMap[p->id]    = p;
+                aScene->urlPtrMap[p->id]    = p;
                 return p;
             
             } else return nullptr;  
@@ -123,7 +124,7 @@ namespace GTech {
 
         std::string GetParentName(const tinyxml2::XMLElement& e);        
 
-        const Scene& GetScene(){
+        std::shared_ptr<const Scene> GetScene(){
             return aScene;
         }
 

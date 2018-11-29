@@ -33,7 +33,7 @@ bool GTech::ColladaVisitor::VisitEnter_library_geometries(const tinyxml2::XMLEle
     if (eName == "geometry") {
 
         pMeshTmp                        = CreateElement<GTech::Mesh>(pa);
-        aScene.meshes[pMeshTmp->name]   = pMeshTmp;
+        aScene->meshes[pMeshTmp->name]   = pMeshTmp;
 
     } else if (eName == "source") {
 

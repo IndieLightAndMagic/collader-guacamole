@@ -70,20 +70,20 @@ bool GTech::ColladaVisitor::VisitEnter(const XMLElement& e, const XMLAttribute* 
 
     } else if (eName == "authoring_tool") {
 
-        aScene.authoring_tool = GetElementText(e);
+        aScene->authoring_tool = GetElementText(e);
 
     } else if (eName == "created") { 
 
-        aScene.created = GetElementText(e);
+        aScene->created = GetElementText(e);
 
     } else if (eName == "modified") { 
 
-        aScene.modified = GetElementText(e);
+        aScene->modified = GetElementText(e);
 
     } else if (eName == "up_axis") {
 
         auto z_up = GetElementText(e);
-        aScene.z_up = z_up == "Z_UP" ? true : false;
+        aScene->z_up = z_up == "Z_UP" ? true : false;
 
     } else if (visitorState == ColladaVisitor::VisitorState::newparam){
 

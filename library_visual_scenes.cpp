@@ -19,12 +19,12 @@ bool GTech::ColladaVisitor::VisitEnter_library_visual_scenes(const tinyxml2::XML
 
     if (eName == "visual_scene"){
 
-        aScene.SetIdName(pa);
+        aScene->SetIdName(pa);
 
     } else if (eName == "node"){
 
         pNodeTmp                       = CreateElement<GTech::Node>(pa);
-        aScene.nodes[pNodeTmp->name]   = pNodeTmp;
+        aScene->nodes[pNodeTmp->name]   = pNodeTmp;
 
     } else if (eName == "matrix") {
 
@@ -52,13 +52,13 @@ bool GTech::ColladaVisitor::VisitEnter_library_visual_scenes(const tinyxml2::XML
         auto symbol                 = attrMap["symbol"];
         auto target                 = std::string{attrMap["target"].c_str() + 1};
         
-        for ( auto& url_idname: aScene.urlPtrMap){
+        for ( auto& url_idname: aScene->urlPtrMap){
 
             //Lookout for target
             if (url_idname.first != target) continue;
 
             //Target found, create a new entry pointer to the same idname;
-            aScene.urlPtrMap[symbol]    = url_idname.second;
+            aScene->urlPtrMap[symbol]    = url_idname.second;
 
         }
 

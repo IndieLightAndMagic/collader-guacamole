@@ -18,7 +18,7 @@ bool GTech::ColladaVisitor::VisitEnter_library_materials(const tinyxml2::XMLElem
     if( eName == "material"){
 
         pMaterialTmp                            = CreateElement<GTech::Material>(pa);
-        aScene.materials[pMaterialTmp->name]    = pMaterialTmp;
+        aScene->materials[pMaterialTmp->name]    = pMaterialTmp;
 
     } else if (eName == "instance_effect") {
 

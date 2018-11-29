@@ -56,6 +56,8 @@ target_link_libraries(${TARGET_NAME}
 	${GTECH_DIR_LIB}/libSDL2.a
 	${GTECH_DIR_LIB}/libShaderMan.a
 	${GTECH_DIR_LIB}/libECS.a
+	${GTECH_DIR_LIB}/libAssetManager.a
+	
 	"-liconv"
 	"-lm")
 

@@ -21,7 +21,7 @@ bool GTech::ColladaVisitor::VisitEnter_library_lights(const tinyxml2::XMLElement
     if (eName == "light"){
 
         pLightTmp                       = CreateElement<GTech::Light>(pa);
-        aScene.lights[pLightTmp->name]  = pLightTmp;
+        aScene->lights[pLightTmp->name]  = pLightTmp;
 
     } else if (eName == "color") {
 

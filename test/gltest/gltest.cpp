@@ -13,110 +13,23 @@
 #endif /*__APPLE__*/
 
 
+#include <AssetManager/assetmanager.h>
 #include <ECS/Entity/entitymanager.h>
 #include <ECS/System/sceneresourcer.h>
+#include <ECS/System/glRendering.h>
+
 #include <SDLWrapper/sdlwrapper.h>
 #include <ShaderMan/shdr.h>
 #include <collader/collader.h>
 
-/* A simple function that will read a file into an allocated char pointer buffer */
-GTech::Program GetShaders();
-
-struct VtxEntry {
-
-    std::vector<unsigned int>    vao{};
-    std::vector<unsigned int>   ebos{};
-    std::vector<unsigned int>   vbos{};
-
-}; 
 
 
-std::shared_ptr<VtxEntry> GetVtxs(const GTech::Mesh& mesh){
-    
-    /* Get Vtxs */
-    auto meshdata            = mesh.floatVector.data();
-    auto meshdatasize        = mesh.floatVector.size() * sizeof(float);
-    auto vtxentry            = std::make_shared<VtxEntry>();
 
-    /* Get the number of "triangle-composites" */ 
-    auto nTriangleComposites = mesh.triangleArray.size();
-
-    /* For each <triangles/> collada element generate a vao */
-    vtxentry->vao.reserve(nTriangleComposites);
-    glGenVertexArrays(nTriangleComposites, vtxentry->vao.data());
-
-
-    for (auto index = 0; index < nTriangleComposites; ++index){
-
-        unsigned int vbo, ebo;
-        auto pTriangleCompositeRaw = mesh.triangleArray[index].get();
-        auto indexdata             = pTriangleCompositeRaw->indexArray.data();
-        auto indexdatasize         = pTriangleCompositeRaw->indexArray.size() * sizeof(unsigned int);
-
-        glBindVertexArray(vtxentry->vao[index]);
-
-        glGenBuffers(1, &vbo);
-        glGenBuffers(1, &ebo);
-        
-        vtxentry->ebos.push_back(ebo);
-        vtxentry->vbos.push_back(vbo);
-
-        glBindBuffer(GL_ARRAY_BUFFER, vbo);
-        glBufferData(GL_ARRAY_BUFFER, meshdatasize, meshdata, GL_STATIC_DRAW);
-
-        glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, ebo);
-        glBufferData(GL_ELEMENT_ARRAY_BUFFER, indexdatasize, indexdata, GL_STATIC_DRAW);
-
-        for (auto& input : pTriangleCompositeRaw->meshTrianglesInput){
-            
-            /* <input/> */
-            unsigned int vertexAttributeId;
-            
-            auto offset      = input.offset;
-            auto pOffset     = &meshdata[offset];
-            auto source      = input.source;
-            auto map         = mesh.meshSourceMap;
-            auto pMeshSource = map[source];
-            auto stride      = pMeshSource->stride;
-
-            if (input.semanticType == GTech::MeshTrianglesInput::DataType::TEXCOORD){
-                vertexAttributeId = 2;
-            } else if (input.semanticType == GTech::MeshTrianglesInput::DataType::NORMAL){
-                vertexAttributeId = 1;
-            } else if (input.semanticType == GTech::MeshTrianglesInput::DataType::VERTEX){
-                vertexAttributeId = 0;
-            }
-
-            glVertexAttribPointer(vertexAttributeId, stride, GL_FLOAT, GL_FALSE, stride*sizeof(GLfloat), pOffset);
-            glEnableVertexAttribArray(vertexAttributeId);
-
-        }
-        
-    }
-
-    return vtxentry;
-}
 void drawscene(const GTech::Scene& rScene)
 {
     
-    /* Get GPU Program */
-    auto shaderprogram = GetShaders();
-    shaderprogram.use();
-    
-    std::map<std::string, std::shared_ptr<VtxEntry>> vtxs{};
 
-    for (auto& meshname_mesh : rScene.meshes){
 
-        const auto meshname = meshname_mesh.first;
-        const auto pmesh    = meshname_mesh.second;
-
-        /* Get OpenGl graphics indexed data */
-        auto pGraphicsIndexedData = GetVtxs(*pmesh);
-        
-
-        
-
-    }
 
     
     /* Loop our display increasing the number of shown vertexes each time.
@@ -210,31 +123,6 @@ std::vector<char> filetobuf(const char *file){
     return buffer; /* Return the buffer */
 }
 
-GTech::Scene GetScene(std::string path){
-
-    tinyxml2::XMLDocument doc;
-    auto result = doc.LoadFile(path.c_str());
-
-    if ( result != tinyxml2::XML_SUCCESS){
-
-        std::cout << "Returning an empty Scene.... Couldn't load collada file.... \n";
-        return GTech::Scene{};
-    
-    } else {
-
-        std::cout << "Ok scene file was successfully loaded.... \n"; 
-
-    }
-
-    GTech::ColladaVisitor visitor;
-    auto pVisitor = &visitor;
-    doc.Accept(pVisitor);
-    auto aScene = visitor.GetScene();
-
-    std::cout << "Scene name is: " << aScene.name << std::endl;
-
-    return aScene;
-}
 
 void destroywindow()
 {
@@ -251,35 +139,12 @@ int main(int argc, char *argv[])
     std::cout << "GL SHADING LANGUAGE VERSION: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << " " << glGetString(GL_VERSION) << std::endl; 
     std::cout << "Resource directory: " << RESOURCES_DIR << std::endl; 
     
+    GTech::SceneResourceManagerMap srmm;
+
+
     auto daePath = std::string{RESOURCES_DIR} + std::string{"/simple.dae"};
-    auto scene   = GetScene(daePath);
-
-    for (auto&nodekey_nodeptr : scene.nodes){
-
-        auto nodeptr = nodekey_nodeptr.second;
-        std::cout << "Node: " << nodeptr->name << " -- ";
-        if (nodeptr->nodeType == GTech::Node::NodeType::MESH) std::cout << "MESH";
-        if (nodeptr->nodeType == GTech::Node::NodeType::LIGHT) std::cout << "LIGHT";
-        if (nodeptr->nodeType == GTech::Node::NodeType::CAMERA) std::cout << "CAMERA";
-        std::cout << std::endl;
-
-        if (nodeptr->nodeType == GTech::Node::NodeType::MESH){
-
-            auto meshptr = std::dynamic_pointer_cast<GTech::Mesh>(nodeptr);
-        } 
-
-    }
-
-    auto resourcemanager = GTech::ResourceManager::GetInstance();
-    auto cubeid0 = resourcemanager.Load(daePath + std::string{"/Cube"});
-    auto camera0 = resourcemanager.Load(daePath + std::string{"/Camera"});
-    auto lamp0 = resourcemanager.Load(daePath + std::string{"/Lamp"});
-
-
-
-    /* Call our function that performs opengl operations */
-    //drawscene(scene);
-
+    auto pscene = srmm[daePath];
+    
     /* Delete our opengl context, destroy our window, and shutdown SDL */
     destroywindow();
 

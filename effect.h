@@ -15,9 +15,15 @@
 
 namespace GTech {
 
-    struct Effect : public GTech::IdName{
+    struct Effect : public GTech::IdName {
 
-    	enum class ShaderType {BLINN, CONSTANT, LAMBERT, PHONG};
+    	enum class ShaderType : unsigned int {
+            BLINN = 0, 
+            CONSTANT = 1, 
+            LAMBERT = 2, 
+            PHONG = 3 
+        };
+        
         std::map<std::string, GTech::Effect::ShaderType> shadertypemap {
             std::make_pair("blinn", GTech::Effect::ShaderType::BLINN),
             std::make_pair("phong", GTech::Effect::ShaderType::PHONG),

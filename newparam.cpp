@@ -40,7 +40,7 @@ bool GTech::ColladaVisitor::VisitEnter_newparam(const XMLElement& e, const XMLAt
         pNewParamTmp                          = CreateElement<GTech::Surface>(parent_pa);
         
         //Set the type
-        aScene.parameters[pNewParamTmp->name] = pNewParamTmp;  
+        aScene->parameters[pNewParamTmp->name] = pNewParamTmp;  
         pNewParamTmp->paramType               = GTech::NewParam::ParamType::SURFACE;
 
     } else if (eName == "sampler2D") {
@@ -49,7 +49,7 @@ bool GTech::ColladaVisitor::VisitEnter_newparam(const XMLElement& e, const XMLAt
         auto parent_pa = parent_e->FirstAttribute();
         pNewParamTmp.reset();
         pNewParamTmp                          = CreateElement<GTech::Sampler2D>(parent_pa);
-        aScene.parameters[pNewParamTmp->name] = pNewParamTmp;  
+        aScene->parameters[pNewParamTmp->name] = pNewParamTmp;  
         pNewParamTmp->paramType               = GTech::NewParam::ParamType::SAMPLER2D;
         
     } else if (eName == "init_from") {

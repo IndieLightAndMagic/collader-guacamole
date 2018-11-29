@@ -21,7 +21,7 @@ bool GTech::ColladaVisitor::VisitEnter_library_effects(const XMLElement& e, cons
     if (eName == "effect") {
 
         pShaderTmp                          = CreateElement<GTech::Effect>(pa);
-        aScene.shaders[pShaderTmp->name]    = pShaderTmp; 
+        aScene->shaders[pShaderTmp->name]    = pShaderTmp; 
         
     } else if (eName == "float") {
 

@@ -20,7 +20,7 @@ bool GTech::ColladaVisitor::VisitEnter_library_images(const tinyxml2::XMLElement
 
 
         pImageTmp                        = CreateElement<GTech::Image>(pa);
-        aScene.images[pImageTmp->name]   = pImageTmp;
+        aScene->images[pImageTmp->name]   = pImageTmp;
 
     } else if (eName == "init_from") {
 

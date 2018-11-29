@@ -16,7 +16,7 @@ bool GTech::ColladaVisitor::VisitEnter_library_cameras(const XMLElement& e, cons
     if (eName == "camera"){
 
         pCameraTmp                          = CreateElement<GTech::Camera>(pa);
-        aScene.cameras[pCameraTmp->name]    = pCameraTmp; 
+        aScene->cameras[pCameraTmp->name]    = pCameraTmp; 
 
     } else if (eName == "yfov") {
 

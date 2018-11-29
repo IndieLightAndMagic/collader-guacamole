@@ -18,8 +18,11 @@
 #include "material.h"
 #include "newparam.h"
 
+
 namespace GTech {
 
+    struct ColladaVisitor;
+    
     struct Scene : public GTech::IdName {
 
         bool z_up{false};
@@ -40,6 +43,7 @@ namespace GTech {
         std::map<std::string, std::shared_ptr<GTech::Material>> materials{};
         std::map<std::string, std::shared_ptr<GTech::NewParam>> parameters{};
         std::map<std::string, std::shared_ptr<GTech::IdName>> urlPtrMap;
+
 
     };
 
