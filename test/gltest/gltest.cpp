@@ -138,13 +138,12 @@ int main(int argc, char *argv[])
     GTech::SDLInitialization();
     std::cout << "GL SHADING LANGUAGE VERSION: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << " " << glGetString(GL_VERSION) << std::endl; 
     std::cout << "Resource directory: " << RESOURCES_DIR << std::endl; 
-    
-    GTech::SceneResourceManagerMap srmm;
 
+    auto daePathResource = std::string{"../resources/simple.dae"} + std::string{"/Cube"};
 
-    auto daePath = std::string{RESOURCES_DIR} + std::string{"/simple.dae"};
-    auto pscene = srmm[daePath];
-    
+    auto resourcemanager = GTech::ResourceManager::GetInstance();
+    auto cube_id = resourcemanager.Load(daePathResource);
+
     /* Delete our opengl context, destroy our window, and shutdown SDL */
     destroywindow();
 

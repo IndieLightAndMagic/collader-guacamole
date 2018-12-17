@@ -8,7 +8,6 @@
 #include <vector>
 #include <map>
 
-#include <ECS/Component/componentmanager.h>
 
 #include "idname.h"
 

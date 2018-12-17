@@ -3,7 +3,6 @@
 cmake_minimum_required(VERSION 3.9.0 FATAL_ERROR)
 set(TARGET_NAME gltest)
 project(${TARGET_NAME})
-set(CMAKE_VERBOSE_MAKEFILE TRUE)
 set(CMAKE_CXX_STANDARD 17)
 
 #DIRECTORIES
@@ -36,6 +35,8 @@ add_executable(${TARGET_NAME}
     gltest.cpp
     
 )
+set(CMAKE_VERBOSE_MAKEFILE TRUE)
+
 set(CMAKE_BUILD_TYPE Debug)
 
 
