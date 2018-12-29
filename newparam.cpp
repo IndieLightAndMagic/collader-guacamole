@@ -1,6 +1,7 @@
 #include "newparam.h"
 #include "collader.h"
 #include <tuple>
+#include <functional>
 
 using namespace tinyxml2;
 using namespace std;

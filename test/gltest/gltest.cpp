@@ -9,7 +9,7 @@
 #include <OpenGL/gl3.h>
 #include <OpenGL/glext.h>
 #else 
-#include <OpenGL/gl.h>
+#include <GL/gl.h>
 #endif /*__APPLE__*/
 
 

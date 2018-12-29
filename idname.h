@@ -4,6 +4,7 @@
 #include "tinyxml2/tinyxml2.h"
 
 #include <map>
+#include <memory>
 #include <cassert>
 #include <iostream>
 
