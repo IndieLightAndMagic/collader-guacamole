@@ -20,47 +20,25 @@ set(GTECH_DIR_LIB ${GTECH_DIR}/3rd/lib)
 set(GTECH_DIR_INC ${GTECH_DIR}/3rd/include)
 
 
-#GLM
-set(GLM_INC_DIR ${GTECH_DIR}/GLM)
-
-#COLLADER
-set(COLLADER_INC_DIR ${GTECH_DIR_INC}/collader)
-
-#SDL2 
-set(SDL2_INC_DIR ${GTECH_DIR}/SDL/include) 
-set(SDL2_LIB_DIR ${GTECH_DIR}/SDLMake2) 
-
 add_executable(${TARGET_NAME}  
 
     gltest.cpp
     
 )
 set(CMAKE_VERBOSE_MAKEFILE TRUE)
-
 set(CMAKE_BUILD_TYPE Debug)
 
 
 
 #========= INCLUDE ==============#
 
-target_include_directories(${TARGET_NAME} PUBLIC ${GLM_INC_DIR})
-target_include_directories(${TARGET_NAME} PUBLIC ${COLLADER_INC_DIR})
-target_include_directories(${TARGET_NAME} PUBLIC ${SDL2_INC_DIR})
 target_include_directories(${TARGET_NAME} PUBLIC ${GTECH_DIR_INC})
 
 #========== LINK ================#
 
 target_link_libraries(${TARGET_NAME}
-	${GTECH_DIR_LIB}/libcollader.a
-	${GTECH_DIR_LIB}/libsdlwrapper.a
-	${GTECH_DIR_LIB}/libSDL_image.a
-	${GTECH_DIR_LIB}/libSDL2.a
-	${GTECH_DIR_LIB}/libShaderMan.a
-	${GTECH_DIR_LIB}/libECS.a
-	${GTECH_DIR_LIB}/libAssetManager.a
-	
-	"-liconv"
-	"-lm")
+    ${GTECH_DIR_LIB}/libcollader.a ${GTECH_DIR_LIB}/libShaderMan.a ${GTECH_DIR_LIB}/libglfw3.a "-liconv" "-lm"
+        )
 
 get_filename_component(COLLADER_TEST_RESOURCE ${ROOT_DIR}/../resources ABSOLUTE)
 target_compile_definitions(${TARGET_NAME} PUBLIC RESOURCES_DIR="${COLLADER_TEST_RESOURCE}")
@@ -69,7 +47,7 @@ target_compile_definitions(${TARGET_NAME} PUBLIC RESOURCES_DIR="${COLLADER_TEST_
 #========== MacOS ===============#
 
 target_link_libraries(${PROJECT_NAME}
-		"-framework Carbon" "-framework ForceFeedback" "-framework IOKit" "-framework Cocoa" "-framework CoreVideo"
-		"-framework AudioToolbox" "-framework CoreAudio" "-framework CoreFoundation" "-framework AppKit"  
-		"-framework OpenGL")
+        "-framework Carbon" "-framework ForceFeedback" "-framework IOKit" "-framework Cocoa" "-framework CoreVideo"
+        "-framework AudioToolbox" "-framework CoreAudio" "-framework CoreFoundation" "-framework AppKit"  
+        "-framework OpenGL")
 
