@@ -24,6 +24,7 @@ set(GTECH_DIR_INC ${GTECH_DIR}/3rd/include)
 add_executable(${TARGET_NAME}  
 
     gltest.cpp
+    thescene.cpp
     ${GTECH_DIR_SRC}/glad.c
 )
 set(CMAKE_VERBOSE_MAKEFILE TRUE)

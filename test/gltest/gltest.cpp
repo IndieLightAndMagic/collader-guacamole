@@ -8,11 +8,34 @@
 
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <ShaderMan/shdr.h>
 
+#include "thescene.h"
 
 struct App{
 	
 	bool m_valid{false};
+
+    GTech::Program program;
+    bool programIsLinked{false};
+    void GetShaders() {
+
+
+        auto vtxShaderSrc = GTech::ShaderSource("../gltest.vert");
+        auto vtxShader    = GTech::Shader(&vtxShaderSrc, GL_VERTEX_SHADER);
+    
+        auto frgShaderSrc = GTech::ShaderSource("../gltest.frag");
+        auto frgShader    = GTech::Shader(&frgShaderSrc, GL_FRAGMENT_SHADER);
+
+        program.pushShader(&vtxShader);
+        program.pushShader(&frgShader);
+
+        program.link();
+
+        auto programIsLinked = program.isLinked();
+        
+    }
+
 
     App(){
 
@@ -60,7 +83,13 @@ int main(int argc, char *argv[])
     std::cout << "GL SHADING LANGUAGE VERSION: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << " " << glGetString(GL_VERSION) << std::endl; 
     std::cout << "Resource directory: " << RESOURCES_DIR << std::endl; 
 
+    //app.GetShaders();
+    //std::cout << "Shaders are linked: " << app.programIsLinked << std::endl;
 
+
+
+    //TheScene scene;
+    //scene.SetupGeometry();
 
     return 0;
 }
