@@ -16,6 +16,7 @@ message(STATUS "-----------------------------")
 #GTECH directory 
 #Installation directory 
 get_filename_component(GTECH_DIR $ENV{GTECH_ROOT} ABSOLUTE)
+set(GTECH_DIR_SRC ${GTECH_DIR}/3rd/src)
 set(GTECH_DIR_LIB ${GTECH_DIR}/3rd/lib)
 set(GTECH_DIR_INC ${GTECH_DIR}/3rd/include)
 
@@ -23,7 +24,7 @@ set(GTECH_DIR_INC ${GTECH_DIR}/3rd/include)
 add_executable(${TARGET_NAME}  
 
     gltest.cpp
-    
+    ${GTECH_DIR_SRC}/glad.c
 )
 set(CMAKE_VERBOSE_MAKEFILE TRUE)
 set(CMAKE_BUILD_TYPE Debug)

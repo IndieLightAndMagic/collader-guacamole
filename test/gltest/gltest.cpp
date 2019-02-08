@@ -6,31 +6,9 @@
 #include <vector>
 
 
+#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 
-#include <collader/collader.h>
-#include <ShaderMan/shdr.h>
-
-
-
-GTech::Program GetShaders() {
-
-    auto vtxShaderSrc = GTech::ShaderSource("../gltest.vert");
-    auto vtxShader    = GTech::Shader(&vtxShaderSrc, GL_VERTEX_SHADER);
-    
-    auto frgShaderSrc = GTech::ShaderSource("../gltest.frag");
-    auto frgShader    = GTech::Shader(&frgShaderSrc, GL_FRAGMENT_SHADER);
-
-    auto program = GTech::Program();
-    program.pushShader(&vtxShader);
-    program.pushShader(&frgShader);
-
-    program.link();
-
-    auto programIsLinked = program.isLinked();
-
-    return program; 
-}
 
 struct App{
 	
@@ -38,18 +16,26 @@ struct App{
 
     App(){
 
+        glfwSetErrorCallback(App::ErrorCB);
+        
         auto result = glfwInit();
         if (!result) return;
-        glfwSetErrorCallback(App::ErrorCB);
-        glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 4 );
-		glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 5 );
-		glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
-		//glfwWindowHint( GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE );
 
-        auto pWindow = glfwCreateWindow(800, 600, "Some Title", nullptr, nullptr);
+        glfwWindowHint( GLFW_RESIZABLE, GLFW_FALSE );
+        glfwWindowHint( GLFW_CONTEXT_VERSION_MAJOR, 3 );
+		glfwWindowHint( GLFW_CONTEXT_VERSION_MINOR, 2 );
+		glfwWindowHint( GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE );
+		glfwWindowHint( GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE );
+
+        auto pWindow = glfwCreateWindow(800, 600, "Wolfenray", nullptr, nullptr);
         if (!pWindow){
+            glfwTerminate();
         	std::cout << "FATAL: Error Creating Window" << std::endl;
+            std::exit(EXIT_FAILURE);
         }
+
+        glfwMakeContextCurrent(pWindow);
+        gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
     }
 
     static void ErrorCB(int errorNumber, const char* errorDesc){
@@ -64,14 +50,15 @@ struct App{
 
 };
 
+ 
+
+
 /* Our program's entry point */
 int main(int argc, char *argv[])
 {
     App app;
     std::cout << "GL SHADING LANGUAGE VERSION: " << glGetString(GL_SHADING_LANGUAGE_VERSION) << " " << glGetString(GL_VERSION) << std::endl; 
     std::cout << "Resource directory: " << RESOURCES_DIR << std::endl; 
-
-    auto daePathResource = std::string{"../resources/simple.dae"} + std::string{"/Cube"};
 
 
 
