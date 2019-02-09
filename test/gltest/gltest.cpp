@@ -10,31 +10,13 @@
 #include <GLFW/glfw3.h>
 #include <ShaderMan/shdr.h>
 
+#include "therenderer.h"
 #include "thescene.h"
 
 struct App{
 	
 	bool m_valid{false};
 
-    GTech::Program program;
-    bool programIsLinked{false};
-    void GetShaders() {
-
-
-        auto vtxShaderSrc = GTech::ShaderSource("../gltest.vert");
-        auto vtxShader    = GTech::Shader(&vtxShaderSrc, GL_VERTEX_SHADER);
-    
-        auto frgShaderSrc = GTech::ShaderSource("../gltest.frag");
-        auto frgShader    = GTech::Shader(&frgShaderSrc, GL_FRAGMENT_SHADER);
-
-        program.pushShader(&vtxShader);
-        program.pushShader(&frgShader);
-
-        program.link();
-
-        auto programIsLinked = program.isLinked();
-        
-    }
 
 
     App(){

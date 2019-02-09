@@ -9,7 +9,7 @@
 
 struct TheScene {
 
-    unsigned vbo, vao;
+    unsigned int vbo, vao;
     static float vertices[];
     void SetupGeometry();
     TheScene();

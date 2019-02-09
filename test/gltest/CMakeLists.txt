@@ -25,6 +25,7 @@ add_executable(${TARGET_NAME}
 
     gltest.cpp
     thescene.cpp
+    datastructures.cpp
     ${GTECH_DIR_SRC}/glad.c
 )
 set(CMAKE_VERBOSE_MAKEFILE TRUE)
