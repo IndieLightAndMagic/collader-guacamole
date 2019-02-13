@@ -3,7 +3,7 @@
 #include <ShaderMan/shdr.h>
 
 
-
+#include "datastructures.h"
 
 
 

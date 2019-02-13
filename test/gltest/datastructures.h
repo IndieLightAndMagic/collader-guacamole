@@ -1,16 +1,20 @@
-#include <vector>
 #include <map>
-
+#include <vector>
 namespace RenderingData {
 
-    template <typename MatrixType>
-    struct RenderData {
+    template <typename MT>
+    struct TmtxVector{
+        std::vector<MT> tmtxVector{};
+    };
 
-        using vectormatrix = std::vector<MatrixType>;
-        using mapvaomatrix = std::map<unsigned int, vectormatrix>; 
+    template <typename MT>
+    struct VaoTmtxVector{
+        std::map<unsigned int, TmtxVector<MT>> vaoTmtxVectorMap{};
+    };
 
-        std::map<unsigned int, mapvaomatrix> mShaderVaoMatrix;
-        
+    template <typename MT>
+    struct ProgramVao {
+        std::map<unsigned int, VaoTmtxVector<MT>> programVaoMap{};
     };
 
 };

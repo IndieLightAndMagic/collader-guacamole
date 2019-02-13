@@ -10,7 +10,6 @@
 #include <GLFW/glfw3.h>
 #include <ShaderMan/shdr.h>
 
-#include "therenderer.h"
 #include "thescene.h"
 
 struct App{
