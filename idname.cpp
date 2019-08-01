@@ -1,6 +1,6 @@
 #include "idname.h"
 
-using namespace GTech;
+using namespace QQE;
 void IdName::SetIdName(const tinyxml2::XMLAttribute *pa){
 
 	assert(pa != nullptr);

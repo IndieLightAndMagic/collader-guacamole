@@ -1,7 +1,7 @@
 #ifndef __IDNAME_H__
 #define __IDNAME_H__
 
-#include "tinyxml2/tinyxml2.h"
+#include <tinyxml2.h>
 
 #include <map>
 #include <memory>
@@ -10,10 +10,10 @@
 
 
 
-namespace GTech {
+namespace QQE {
 	
 	struct IdName;
-	using IdMap = std::map<std::string, std::shared_ptr<GTech::IdName>>;
+	using IdMap = std::map<std::string, std::shared_ptr<QQE::IdName>>;
     
     struct IdName {
         std::string id;

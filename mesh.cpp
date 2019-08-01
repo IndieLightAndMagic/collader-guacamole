@@ -1,4 +1,4 @@
 #include "mesh.h"
 
-using namespace GTech;
+using namespace QQE;
 

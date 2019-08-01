@@ -19,11 +19,11 @@
 #include "newparam.h"
 
 
-namespace GTech {
+namespace QQE {
 
     struct ColladaVisitor;
     
-    struct Scene : public GTech::IdName {
+    struct Scene : public QQE::IdName {
 
         bool z_up{false};
 
@@ -32,17 +32,17 @@ namespace GTech {
         std::string modified{};
 
         //---------- These are indexed with natural names ---------------//
-        std::map<std::string, std::shared_ptr<GTech::Node>> nodes{};
-        std::map<std::string, std::shared_ptr<GTech::Mesh>> meshes{};
-        std::map<std::string, std::shared_ptr<GTech::Camera>> cameras{};
-        std::map<std::string, std::shared_ptr<GTech::Light>> lights{};
+        std::map<std::string, std::shared_ptr<QQE::Node>> nodes{};
+        std::map<std::string, std::shared_ptr<QQE::Mesh>> meshes{};
+        std::map<std::string, std::shared_ptr<QQE::Camera>> cameras{};
+        std::map<std::string, std::shared_ptr<QQE::Light>> lights{};
 
         //--------- These are indexed with url and ids  ----------//
-        std::map<std::string, std::shared_ptr<GTech::Effect>> shaders{};
-        std::map<std::string, std::shared_ptr<GTech::Image>> images{};
-        std::map<std::string, std::shared_ptr<GTech::Material>> materials{};
-        std::map<std::string, std::shared_ptr<GTech::NewParam>> parameters{};
-        std::map<std::string, std::shared_ptr<GTech::IdName>> urlPtrMap;
+        std::map<std::string, std::shared_ptr<QQE::Effect>> shaders{};
+        std::map<std::string, std::shared_ptr<QQE::Image>> images{};
+        std::map<std::string, std::shared_ptr<QQE::Material>> materials{};
+        std::map<std::string, std::shared_ptr<QQE::NewParam>> parameters{};
+        std::map<std::string, std::shared_ptr<QQE::IdName>> urlPtrMap;
 
 
     };

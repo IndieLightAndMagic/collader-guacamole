@@ -1,3 +1,3 @@
 #include "light.h"
 
-using namespace GTech;
+using namespace QQE;

@@ -10,7 +10,7 @@
 
 #include "idname.h"
 
-namespace GTech {
+namespace QQE {
 
 	struct MeshSource {
 
@@ -31,14 +31,14 @@ namespace GTech {
             NORMAL = 0x01, 
             VERTEX = 0x00
         };
-        GTech::MeshTrianglesInput::DataType	semanticType{MeshTrianglesInput::DataType::NONE};
+        QQE::MeshTrianglesInput::DataType	semanticType{MeshTrianglesInput::DataType::NONE};
         std::string                         source{};
         unsigned int                        offset{0};
         
-        std::map<std::string, GTech::MeshTrianglesInput::DataType> semanticTypeMap{
-            std::make_pair("VERTEX", GTech::MeshTrianglesInput::DataType::VERTEX),
-            std::make_pair("NORMAL", GTech::MeshTrianglesInput::DataType::NORMAL),
-            std::make_pair("TEXCOORD", GTech::MeshTrianglesInput::DataType::TEXCOORD)
+        std::map<std::string, QQE::MeshTrianglesInput::DataType> semanticTypeMap{
+            std::make_pair("VERTEX", QQE::MeshTrianglesInput::DataType::VERTEX),
+            std::make_pair("NORMAL", QQE::MeshTrianglesInput::DataType::NORMAL),
+            std::make_pair("TEXCOORD", QQE::MeshTrianglesInput::DataType::TEXCOORD)
         };             
 
         
@@ -48,16 +48,16 @@ namespace GTech {
         
         unsigned int                            count{0};
         std::string                             material{};
-        std::vector<GTech::MeshTrianglesInput>  meshTrianglesInput{};
+        std::vector<QQE::MeshTrianglesInput>  meshTrianglesInput{};
         std::vector<unsigned int>               indexArray{};
 
         
     };
 
-    struct Mesh : public GTech::IdName {
+    struct Mesh : public QQE::IdName {
 
-        std::map<std::string, std::shared_ptr<GTech::MeshSource>>   meshSourceMap{};
-        std::vector<std::shared_ptr<GTech::MeshTriangles>>          triangleArray{};
+        std::map<std::string, std::shared_ptr<QQE::MeshSource>>   meshSourceMap{};
+        std::vector<std::shared_ptr<QQE::MeshTriangles>>          triangleArray{};
         std::vector<float>                                          floatVector{};
 
     };

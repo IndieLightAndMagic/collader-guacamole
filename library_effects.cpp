@@ -6,13 +6,13 @@ using namespace tinyxml2;
 using namespace std;
 
 
-std::shared_ptr<GTech::Effect> pShaderTmp = nullptr;
-bool GTech::ColladaVisitor::VisitExit_library_effects(const XMLElement& e){
+std::shared_ptr<QQE::Effect> pShaderTmp = nullptr;
+bool QQE::ColladaVisitor::VisitExit_library_effects(const XMLElement& e){
     
     return true;
 
 }
-bool GTech::ColladaVisitor::VisitEnter_library_effects(const XMLElement& e, const XMLAttribute* pa){
+bool QQE::ColladaVisitor::VisitEnter_library_effects(const XMLElement& e, const XMLAttribute* pa){
 
     auto eName      = std::string{e.Name()};
     auto parentName = GetParentName(e);
@@ -20,7 +20,7 @@ bool GTech::ColladaVisitor::VisitEnter_library_effects(const XMLElement& e, cons
 
     if (eName == "effect") {
 
-        pShaderTmp                          = CreateElement<GTech::Effect>(pa);
+        pShaderTmp                          = CreateElement<QQE::Effect>(pa);
         aScene->shaders[pShaderTmp->name]    = pShaderTmp; 
         
     } else if (eName == "float") {

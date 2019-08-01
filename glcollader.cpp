@@ -4,7 +4,7 @@
 #include <vector>
 #include <map>
 
-namespace GTech {
+namespace QQE {
 
     struct NodeAccess{
 

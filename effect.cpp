@@ -1,3 +1,3 @@
 #include "effect.h"
 
-using namespace GTech;
+using namespace QQE;

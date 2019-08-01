@@ -6,7 +6,7 @@
 
 #include "idname.h"
 
-namespace GTech {
+namespace QQE {
 
 	struct Image : public IdName {
 

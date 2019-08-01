@@ -6,13 +6,13 @@ using namespace tinyxml2;
 using namespace std;
 
 
-std::tuple<std::string, std::string, const char*> GTech::ColladaVisitor::GetNameParentText(const tinyxml2::XMLElement& e){
+std::tuple<std::string, std::string, const char*> QQE::ColladaVisitor::GetNameParentText(const tinyxml2::XMLElement& e){
 
     return std::make_tuple(std::string{e.Name()}, GetParentName(e), e.GetText());
 
 }
 
-std::string GTech::ColladaVisitor::GetElementText(const XMLElement& e){
+std::string QQE::ColladaVisitor::GetElementText(const XMLElement& e){
 
     auto eText = e.GetText();
     auto eTextString = (eText != nullptr) ? std::string{eText} : std::string{};
@@ -20,14 +20,14 @@ std::string GTech::ColladaVisitor::GetElementText(const XMLElement& e){
 
 }
 
-std::string GTech::ColladaVisitor::GetParentName(const XMLElement &e){
+std::string QQE::ColladaVisitor::GetParentName(const XMLElement &e){
 
     //Get Parent dict
     return std::string{reinterpret_cast<const tinyxml2::XMLElement*>(e.Parent())->Name()};
 
 }
 
-bool GTech::ColladaVisitor::VisitEnter(const XMLElement& e, const XMLAttribute* pa){
+bool QQE::ColladaVisitor::VisitEnter(const XMLElement& e, const XMLAttribute* pa){
     
     auto eName                      = std::string{e.Name()};
     auto eNameSearchForVisitorState = stateMap.find(eName);
@@ -96,7 +96,7 @@ bool GTech::ColladaVisitor::VisitEnter(const XMLElement& e, const XMLAttribute* 
     return true;
 }
 
-bool GTech::ColladaVisitor::VisitExit(const XMLElement& e){
+bool QQE::ColladaVisitor::VisitExit(const XMLElement& e){
 
     auto eName         = std::string{e.Name()};
     auto& visitorState = visitorStateDq.front();

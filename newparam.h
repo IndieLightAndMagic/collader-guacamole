@@ -4,9 +4,9 @@
 #include "idname.h"
 #include <glm/ext.hpp>
 
-namespace GTech {
+namespace QQE {
 
-    struct NewParam : public GTech::IdName {
+    struct NewParam : public QQE::IdName {
         enum class ParamType {
             SURFACE,
             SAMPLER2D
@@ -16,14 +16,14 @@ namespace GTech {
     };
     using NewParamPtr = std::shared_ptr<NewParam>;
     
-    struct Surface  : public GTech::NewParam {
+    struct Surface  : public QQE::NewParam {
 
         std::string init_from{};
         glm::ivec4  format{glm::ivec4(0,0,0,0)};
     
     };
     
-    struct Sampler2D : public GTech::NewParam {
+    struct Sampler2D : public QQE::NewParam {
 
         std::string source{};
 

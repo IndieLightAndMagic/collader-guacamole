@@ -1,7 +1,7 @@
 #ifndef __EFFECT_H__
 #define __EFFECT_H__
 
-#include "glm/glm.hpp"
+#include <glm/glm.hpp>
 #define GLM_ENABLE_EXPERIMENTAL
 #include "glm/gtx/string_cast.hpp"
 
@@ -13,9 +13,9 @@
 #include "idname.h"
 #include "material.h"
 
-namespace GTech {
+namespace QQE {
 
-    struct Effect : public GTech::IdName {
+    struct Effect : public QQE::IdName {
 
     	enum class ShaderType : unsigned int {
             BLINN = 0, 
@@ -24,11 +24,11 @@ namespace GTech {
             PHONG = 3 
         };
         
-        std::map<std::string, GTech::Effect::ShaderType> shadertypemap {
-            std::make_pair("blinn", GTech::Effect::ShaderType::BLINN),
-            std::make_pair("phong", GTech::Effect::ShaderType::PHONG),
-            std::make_pair("lambert", GTech::Effect::ShaderType::LAMBERT),
-            std::make_pair("constant", GTech::Effect::ShaderType::CONSTANT)
+        std::map<std::string, QQE::Effect::ShaderType> shadertypemap {
+            std::make_pair("blinn", QQE::Effect::ShaderType::BLINN),
+            std::make_pair("phong", QQE::Effect::ShaderType::PHONG),
+            std::make_pair("lambert", QQE::Effect::ShaderType::LAMBERT),
+            std::make_pair("constant", QQE::Effect::ShaderType::CONSTANT)
         };
 
 

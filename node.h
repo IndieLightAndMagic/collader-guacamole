@@ -11,15 +11,15 @@
 
 #include "idname.h"
 
-namespace GTech{
+namespace QQE{
 
-	struct Node : public GTech::IdName {
+	struct Node : public QQE::IdName {
 
         enum class NodeType {CAMERA, MESH, LIGHT};
-        std::map <std::string, GTech::Node::NodeType> nodeTypeMap{
-            std::make_pair(std::string{"instance_camera"},  GTech::Node::NodeType::CAMERA),
-            std::make_pair(std::string{"instance_light"},   GTech::Node::NodeType::LIGHT),
-            std::make_pair(std::string{"instance_geometry"}, GTech::Node::NodeType::MESH)
+        std::map <std::string, QQE::Node::NodeType> nodeTypeMap{
+            std::make_pair(std::string{"instance_camera"},  QQE::Node::NodeType::CAMERA),
+            std::make_pair(std::string{"instance_light"},   QQE::Node::NodeType::LIGHT),
+            std::make_pair(std::string{"instance_geometry"}, QQE::Node::NodeType::MESH)
         };
         
         glm::mat4                           transform;

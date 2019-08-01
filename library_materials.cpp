@@ -5,19 +5,19 @@
 using namespace tinyxml2;
 using namespace std;
 
-std::shared_ptr<GTech::Material> pMaterialTmp = nullptr;
+std::shared_ptr<QQE::Material> pMaterialTmp = nullptr;
 
-bool GTech::ColladaVisitor::VisitExit_library_materials(const tinyxml2::XMLElement& e){
+bool QQE::ColladaVisitor::VisitExit_library_materials(const tinyxml2::XMLElement& e){
 
     return true;
 }
-bool GTech::ColladaVisitor::VisitEnter_library_materials(const tinyxml2::XMLElement& e, const tinyxml2::XMLAttribute* pa){
+bool QQE::ColladaVisitor::VisitEnter_library_materials(const tinyxml2::XMLElement& e, const tinyxml2::XMLAttribute* pa){
 
     auto eName = std::string{e.Name()};
 
     if( eName == "material"){
 
-        pMaterialTmp                            = CreateElement<GTech::Material>(pa);
+        pMaterialTmp                            = CreateElement<QQE::Material>(pa);
         aScene->materials[pMaterialTmp->name]    = pMaterialTmp;
 
     } else if (eName == "instance_effect") {

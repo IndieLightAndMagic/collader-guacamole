@@ -4,11 +4,11 @@
 using namespace tinyxml2;
 using namespace std;
 
-std::shared_ptr<GTech::Mesh> pMeshTmp                               = nullptr;
-std::shared_ptr<GTech::MeshSource> pMeshSourceTmp                   = nullptr;
-std::shared_ptr<GTech::MeshTriangles> pMeshTrianglesTmp             = nullptr;
+std::shared_ptr<QQE::Mesh> pMeshTmp                               = nullptr;
+std::shared_ptr<QQE::MeshSource> pMeshSourceTmp                   = nullptr;
+std::shared_ptr<QQE::MeshTriangles> pMeshTrianglesTmp             = nullptr;
 
-bool GTech::ColladaVisitor::VisitExit_library_geometries(const XMLElement& e){
+bool QQE::ColladaVisitor::VisitExit_library_geometries(const XMLElement& e){
 
     auto eName = std::string{e.Name()};
     
@@ -21,7 +21,7 @@ bool GTech::ColladaVisitor::VisitExit_library_geometries(const XMLElement& e){
     return true;
 }
 
-bool GTech::ColladaVisitor::VisitEnter_library_geometries(const tinyxml2::XMLElement& e, const tinyxml2::XMLAttribute* pa){
+bool QQE::ColladaVisitor::VisitEnter_library_geometries(const tinyxml2::XMLElement& e, const tinyxml2::XMLAttribute* pa){
 
     auto eName = std::string{e.Name()};
     auto parentName = GetParentName(e);
@@ -32,12 +32,12 @@ bool GTech::ColladaVisitor::VisitEnter_library_geometries(const tinyxml2::XMLEle
 
     if (eName == "geometry") {
 
-        pMeshTmp                        = CreateElement<GTech::Mesh>(pa);
+        pMeshTmp                        = CreateElement<QQE::Mesh>(pa);
         aScene->meshes[pMeshTmp->name]   = pMeshTmp;
 
     } else if (eName == "source") {
 
-        pMeshSourceTmp                          = std::make_shared<GTech::MeshSource>();
+        pMeshSourceTmp                          = std::make_shared<QQE::MeshSource>();
         pMeshTmp->meshSourceMap[attrMap["id"]]  = pMeshSourceTmp;
 
     } else if (eName == "accessor") {
@@ -92,7 +92,7 @@ bool GTech::ColladaVisitor::VisitEnter_library_geometries(const tinyxml2::XMLEle
 
         } else if (parentName == "triangles") {
 
-            auto aMeshTriangleInput                 = GTech::MeshTrianglesInput{};
+            auto aMeshTriangleInput                 = QQE::MeshTrianglesInput{};
             aMeshTriangleInput.source               = std::string{attrMap["source"].c_str() + 1};
             aMeshTriangleInput.semanticType         = aMeshTriangleInput.semanticTypeMap[attrMap["semantic"]];
             std::stringstream{attrMap["offset"]}    >> aMeshTriangleInput.offset;
@@ -102,7 +102,7 @@ bool GTech::ColladaVisitor::VisitEnter_library_geometries(const tinyxml2::XMLEle
 
     } else if (eName == "triangles") {
 
-        pMeshTrianglesTmp                       = std::make_shared<GTech::MeshTriangles>();
+        pMeshTrianglesTmp                       = std::make_shared<QQE::MeshTriangles>();
         std::stringstream{attrMap["count"]}     >> pMeshTrianglesTmp->count;
         std::stringstream{attrMap["material"]}  >> pMeshTrianglesTmp->material;
 

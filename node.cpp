@@ -1,6 +1,6 @@
 #include "node.h"
 
-using namespace GTech;
+using namespace QQE;
 
 
 

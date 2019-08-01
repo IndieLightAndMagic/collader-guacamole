@@ -5,9 +5,9 @@
 
 #include "idname.h"
 
-namespace GTech {
+namespace QQE {
 
-    struct Light : public GTech::IdName {
+    struct Light : public QQE::IdName {
 
         enum class LightType {POINT, SPOT, SUN};
         float constant_attenuation{0.0f};
@@ -15,7 +15,7 @@ namespace GTech {
         float quadratic_attenuation{0.0f};
 
         glm::vec3 color{1.0f, 0.0f, 0.0f};
-        LightType lightType{GTech::Light::LightType::POINT};
+        LightType lightType{QQE::Light::LightType::POINT};
         
     };
 

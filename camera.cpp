@@ -1,5 +1,5 @@
 #include "camera.h"
 
 
-using namespace GTech;
+using namespace QQE;
 

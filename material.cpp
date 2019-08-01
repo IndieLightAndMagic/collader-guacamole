@@ -1,3 +1,3 @@
 #include "material.h"
 
-using namespace GTech;
+using namespace QQE;

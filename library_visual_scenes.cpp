@@ -5,13 +5,13 @@
 using namespace tinyxml2;
 using namespace std;
 
-std::shared_ptr<GTech::Node> pNodeTmp;
+std::shared_ptr<QQE::Node> pNodeTmp;
 
-bool GTech::ColladaVisitor::VisitExit_library_visual_scenes(const tinyxml2::XMLElement &e){
+bool QQE::ColladaVisitor::VisitExit_library_visual_scenes(const tinyxml2::XMLElement &e){
 
     return true;
 }
-bool GTech::ColladaVisitor::VisitEnter_library_visual_scenes(const tinyxml2::XMLElement &e, const tinyxml2::XMLAttribute *pa){
+bool QQE::ColladaVisitor::VisitEnter_library_visual_scenes(const tinyxml2::XMLElement &e, const tinyxml2::XMLAttribute *pa){
 
     auto eName = std::string{e.Name()};
     auto attrMap = GetAttrMap(pa);
@@ -23,7 +23,7 @@ bool GTech::ColladaVisitor::VisitEnter_library_visual_scenes(const tinyxml2::XML
 
     } else if (eName == "node"){
 
-        pNodeTmp                       = CreateElement<GTech::Node>(pa);
+        pNodeTmp                       = CreateElement<QQE::Node>(pa);
         aScene->nodes[pNodeTmp->name]   = pNodeTmp;
 
     } else if (eName == "matrix") {

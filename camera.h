@@ -11,9 +11,9 @@
 
 #include "idname.h"
 
-namespace GTech {
+namespace QQE {
 
-	struct Camera : public GTech::IdName {
+	struct Camera : public QQE::IdName {
         
         enum class ProjectionType {ORTO, PERS};
         union {

@@ -2,8 +2,8 @@
 #define __COLLADER_H__
 
 
-#include "tinyxml2/tinyxml2.h"
-#include "glm/glm.hpp"
+#include <tinyxml2.h>
+#include <glm/glm.hpp>
 
 #include <string>
 #include <cassert>
@@ -17,7 +17,7 @@
 
 #include "scene.h"
 
-namespace GTech {
+namespace QQE {
 
     class ColladaVisitor : public tinyxml2::XMLVisitor {
 
@@ -41,7 +41,7 @@ namespace GTech {
     private:
         
 
-        std::shared_ptr<GTech::Scene> aScene{std::make_shared<GTech::Scene>()};
+        std::shared_ptr<QQE::Scene> aScene{std::make_shared<QQE::Scene>()};
 
         std::map<std::string, ColladaVisitor::VisitorState > stateMap {
             

@@ -5,9 +5,9 @@
 using namespace tinyxml2;
 using namespace std;
 
-std::shared_ptr<GTech::Camera> pCameraTmp = nullptr;
+std::shared_ptr<QQE::Camera> pCameraTmp = nullptr;
 
-bool GTech::ColladaVisitor::VisitEnter_library_cameras(const XMLElement& e, const XMLAttribute* pa){
+bool QQE::ColladaVisitor::VisitEnter_library_cameras(const XMLElement& e, const XMLAttribute* pa){
 
     auto eName          = std::string {e.Name()};
     auto pText          = GetElementText(e);
@@ -15,7 +15,7 @@ bool GTech::ColladaVisitor::VisitEnter_library_cameras(const XMLElement& e, cons
     
     if (eName == "camera"){
 
-        pCameraTmp                          = CreateElement<GTech::Camera>(pa);
+        pCameraTmp                          = CreateElement<QQE::Camera>(pa);
         aScene->cameras[pCameraTmp->name]    = pCameraTmp; 
 
     } else if (eName == "yfov") {
@@ -28,7 +28,7 @@ bool GTech::ColladaVisitor::VisitEnter_library_cameras(const XMLElement& e, cons
 
     } else if (eName == "ortographic" || eName == "perspective") {
 
-        pCameraTmp->projectionType = (eName == "ortographic") ? GTech::Camera::ProjectionType::ORTO : GTech::Camera::ProjectionType::PERS;
+        pCameraTmp->projectionType = (eName == "ortographic") ? QQE::Camera::ProjectionType::ORTO : QQE::Camera::ProjectionType::PERS;
 
     } else if (eName == "aspect_ratio") {
 
@@ -48,7 +48,7 @@ bool GTech::ColladaVisitor::VisitEnter_library_cameras(const XMLElement& e, cons
 
 }        
 
-bool GTech::ColladaVisitor::VisitExit_library_cameras(const XMLElement& e){
+bool QQE::ColladaVisitor::VisitExit_library_cameras(const XMLElement& e){
 
     return true;
 

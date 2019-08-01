@@ -5,9 +5,9 @@
 
 #include "idname.h"
 
-namespace GTech{
+namespace QQE{
 
-    struct Material : public GTech::IdName {
+    struct Material : public QQE::IdName {
 
         std::string     effectUrl{};
 
