@@ -86,12 +86,13 @@ namespace QQE {
             if ( p ) {
 
                 p->SetIdName(pa);
-                aScene->urlPtrMap[p->id]    = p;
+                aScene->urlPtrMap[p->id.data()]    = p.get();
                 return p;
             
             } else return nullptr;  
             
         }
+
     public:
         
 
@@ -106,7 +107,13 @@ namespace QQE {
 
             auto attrMap = AttrMap{}; 
             for (;pa; pa = pa->Next()){
-                attrMap[std::string{pa->Name()}] = std::string{pa->Value()};
+                auto paValue = pa->Value();
+                auto paValueString = std::string{paValue};
+                auto paName = pa->Name();
+                auto paNameString = std::string{paName};
+                auto name_value = std::make_pair(paNameString, paValueString);
+                attrMap.insert(name_value);
+                //attrMap[std::string{pa->Name()}] = std::string{pa->Value()};
             }
             return attrMap;
         }

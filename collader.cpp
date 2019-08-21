@@ -139,7 +139,6 @@ bool QQE::ColladaVisitor::VisitExit(const XMLElement& e){
         visitorStateDq.pop_front();
 
     }
-
     return retValue;
 }
 

@@ -3,6 +3,8 @@
 cmake_minimum_required(VERSION 3.9.0 FATAL_ERROR)
 set(TARGET_NAME colladertest)
 project(${TARGET_NAME})
+set(CMAKE_VERBOSE_MAKEFILE TRUE)
+set(CMAKE_BUILD_TYPE DEBUG)
 set(CMAKE_CXX_STANDARD 17)
 
 #DIRECTORIES
@@ -15,27 +17,42 @@ message(STATUS "-----------------------------")
 
 #GTECH directory 
 #Installation directory 
-get_filename_component(GTECH_DIR $ENV{GTECH_ROOT} ABSOLUTE)
-set(GTECH_DIR_LIB ${GTECH_DIR}/3rd/lib)
-set(GTECH_DIR_INC ${GTECH_DIR}/3rd/include)
 
 
 #GLM
-set(GLM_INC_DIR ${GTECH_DIR}/GLM)
 #COLLADER
-set(COLLADER_INC_DIR ${GTECH_DIR_INC}/collader)
-
 add_executable(${TARGET_NAME}  
 
     colladertest.cpp
+	../../camera.cpp
+	../../image.cpp
+	../../library_lights.cpp		
+    ../../mesh.cpp
+	../../collader.cpp
+	../../library_cameras.cpp
+	../../library_materials.cpp
+	../../newparam.cpp
+	../../effect.cpp
+	../../library_effects.cpp
+	../../library_visual_scenes.cpp
+	../../node.cpp
+	../../glcollader.cpp
+	../../library_geometries.cpp
+	../../light.cpp
+	../../scene.cpp
+	../../idname.cpp
+	../../library_images.cpp
+	../../material.cpp
+
+
     
 )
-set(CMAKE_VERBOSE_MAKEFILE TRUE)
-set(CMAKE_BUILD_TYPE Debug)
+target_include_directories(${TARGET_NAME} PUBLIC
+	/usr/local/include
+	../..
+	)
 
+target_link_libraries(${TARGET_NAME}
+	/usr/local/lib/libtinyxml2.a		
 
-target_include_directories(${TARGET_NAME} PUBLIC ${GLM_INC_DIR})
-target_include_directories(${TARGET_NAME} PUBLIC ${COLLADER_INC_DIR})
-target_include_directories(${TARGET_NAME} PUBLIC ${GTECH_DIR_INC})
-target_link_libraries(${TARGET_NAME} ${GTECH_DIR_LIB}/libcollader.a)
-
+	)

@@ -58,7 +58,7 @@ bool QQE::ColladaVisitor::VisitEnter_library_visual_scenes(const tinyxml2::XMLEl
             if (url_idname.first != target) continue;
 
             //Target found, create a new entry pointer to the same idname;
-            aScene->urlPtrMap[symbol]    = url_idname.second;
+            aScene->urlPtrMap[symbol.data()]    = url_idname.second;
 
         }
 

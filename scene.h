@@ -42,7 +42,7 @@ namespace QQE {
         std::map<std::string, std::shared_ptr<QQE::Image>> images{};
         std::map<std::string, std::shared_ptr<QQE::Material>> materials{};
         std::map<std::string, std::shared_ptr<QQE::NewParam>> parameters{};
-        std::map<std::string, std::shared_ptr<QQE::IdName>> urlPtrMap;
+        std::map<char*, /*std::shared_ptr<QQE::IdName>*/void*> urlPtrMap;
 
 
     };

@@ -5,7 +5,7 @@
 using namespace tinyxml2;
 using namespace std;
 
-std::shared_ptr<QQE::Camera> pCameraTmp = nullptr;
+QQE::Camera* rpCameraTmp = nullptr;
 
 bool QQE::ColladaVisitor::VisitEnter_library_cameras(const XMLElement& e, const XMLAttribute* pa){
 
@@ -15,32 +15,43 @@ bool QQE::ColladaVisitor::VisitEnter_library_cameras(const XMLElement& e, const 
     
     if (eName == "camera"){
 
-        pCameraTmp                          = CreateElement<QQE::Camera>(pa);
-        aScene->cameras[pCameraTmp->name]    = pCameraTmp; 
+
+        auto cameraNameString = std::string{pa->Next()->Value()};
+        auto sp = std::make_shared<QQE::Camera>();
+        rpCameraTmp = sp.get();
+        auto rp = reinterpret_cast<void*>(rpCameraTmp);
+        auto rpName = std::string{pa->Value()};
+        aScene->cameras[cameraNameString] = sp;
+        sp->id = rpName;
+        sp->name = cameraNameString;
+        auto id_name = std::make_pair(rpName.data(),rp);
+        aScene->urlPtrMap.insert(id_name);
+
+
 
     } else if (eName == "yfov") {
 
-        pTextString >> pCameraTmp->projection.yfov; 
+        pTextString >> rpCameraTmp->projection.yfov;
     
     } else if (eName == "xmag") {
 
-        pTextString >> pCameraTmp->projection.xmag;
+        pTextString >> rpCameraTmp->projection.xmag;
 
     } else if (eName == "ortographic" || eName == "perspective") {
 
-        pCameraTmp->projectionType = (eName == "ortographic") ? QQE::Camera::ProjectionType::ORTO : QQE::Camera::ProjectionType::PERS;
+        rpCameraTmp->projectionType = (eName == "ortographic") ? QQE::Camera::ProjectionType::ORTO : QQE::Camera::ProjectionType::PERS;
 
     } else if (eName == "aspect_ratio") {
 
-        pTextString >> pCameraTmp->aspect_ratio;
+        pTextString >> rpCameraTmp->aspect_ratio;
 
     } else if (eName == "znear") {
 
-        pTextString >> pCameraTmp->znear;
+        pTextString >> rpCameraTmp->znear;
 
     } else if (eName == "zfar") {
 
-        pTextString >> pCameraTmp->zfar;
+        pTextString >> rpCameraTmp->zfar;
 
     }
 
