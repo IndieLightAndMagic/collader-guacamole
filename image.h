@@ -10,7 +10,7 @@ namespace QQE {
 
 	struct Image : public IdName {
 
-        std::string path{};
+        QString path{};
 		
     };
 

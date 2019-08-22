@@ -1,22 +1,19 @@
 //http://www.wazim.com/Collada_Tutorial_1.htm
 #include "collader.h"
+#include <sstream>
 
 
-using namespace tinyxml2;
-using namespace std;
-
-
-std::shared_ptr<QQE::Effect> pShaderTmp = nullptr;
-bool QQE::ColladaVisitor::VisitExit_library_effects(const XMLElement& e){
+QSharedPointer<QQE::Effect> pShaderTmp = nullptr;
+bool QQE::ColladaVisitor::VisitExit_library_effects(const QDomElement& e){
     
     return true;
 
 }
-bool QQE::ColladaVisitor::VisitEnter_library_effects(const XMLElement& e, const XMLAttribute* pa){
+bool QQE::ColladaVisitor::VisitEnter_library_effects(const QDomElement& e, const QDomNamedNodeMap& pa){
 
-    auto eName      = std::string{e.Name()};
+    auto eName      = e.nodeName();
     auto parentName = GetParentName(e);
-    auto eText      = e.GetText();
+    auto eText      = e.text();
 
     if (eName == "effect") {
 
@@ -26,7 +23,7 @@ bool QQE::ColladaVisitor::VisitEnter_library_effects(const XMLElement& e, const 
     } else if (eName == "float") {
 
         float property;
-        std::stringstream{std::string{eText}} >> property;
+        std::stringstream{std::string{eText.toStdString()}} >> property;
 
         if (parentName == "shininess"){
 
@@ -40,13 +37,20 @@ bool QQE::ColladaVisitor::VisitEnter_library_effects(const XMLElement& e, const 
 
     } else if (eName == "color") {
 
-        auto colorVectorText    = std::stringstream{std::string{eText}};
-        auto colorVector        = glm::vec4{};
+        auto colorVectorText    = std::stringstream{eText.toStdString()};
 
-        colorVectorText >> colorVector.r;
-        colorVectorText >> colorVector.g;
-        colorVectorText >> colorVector.b;
-        colorVectorText >> colorVector.a;
+        auto r = 0.0f;
+        auto g = 0.0f;
+        auto b = 0.0f;
+        auto a = 0.0f;
+
+        colorVectorText >> r;
+        colorVectorText >> g;
+        colorVectorText >> b;
+        colorVectorText >> a;
+
+        auto colorVector = QVector4D(r,g,b,a);
+
 
         if (parentName == "emission") {
 
@@ -76,8 +80,8 @@ bool QQE::ColladaVisitor::VisitEnter_library_effects(const XMLElement& e, const 
 
     } else if (eName == "texture") {
 
-        auto attrMap = GetAttrMap(pa);
-        pShaderTmp->textureUrl = std::string{attrMap["texture"]};
+        auto attrMap = GetAttrMap(e);
+        pShaderTmp->textureUrl = attrMap["texture"].toStdString();
     
     } else if (pShaderTmp->shadertypemap.find(eName) != pShaderTmp->shadertypemap.end()) {
 

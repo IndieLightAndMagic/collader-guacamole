@@ -1,16 +1,14 @@
 //http://www.wazim.com/Collada_Tutorial_1.htm
 #include "collader.h"
+#include <sstream>
 
-using namespace tinyxml2;
-using namespace std;
+QSharedPointer<QQE::Mesh> pMeshTmp                               = nullptr;
+QSharedPointer<QQE::MeshSource> pMeshSourceTmp                   = nullptr;
+QSharedPointer<QQE::MeshTriangles> pMeshTrianglesTmp             = nullptr;
 
-std::shared_ptr<QQE::Mesh> pMeshTmp                               = nullptr;
-std::shared_ptr<QQE::MeshSource> pMeshSourceTmp                   = nullptr;
-std::shared_ptr<QQE::MeshTriangles> pMeshTrianglesTmp             = nullptr;
+bool QQE::ColladaVisitor::VisitExit_library_geometries(const QDomElement& e){
 
-bool QQE::ColladaVisitor::VisitExit_library_geometries(const XMLElement& e){
-
-    auto eName = std::string{e.Name()};
+    auto eName = e.nodeName();
     
     if (eName == "triangles") {
 
@@ -21,13 +19,13 @@ bool QQE::ColladaVisitor::VisitExit_library_geometries(const XMLElement& e){
     return true;
 }
 
-bool QQE::ColladaVisitor::VisitEnter_library_geometries(const tinyxml2::XMLElement& e, const tinyxml2::XMLAttribute* pa){
+bool QQE::ColladaVisitor::VisitEnter_library_geometries(const QDomElement& e, const QDomNamedNodeMap& pa){
 
-    auto eName = std::string{e.Name()};
+    auto eName = e.nodeName();
     auto parentName = GetParentName(e);
     
     //Get Attr dict
-    auto attrMap = GetAttrMap(pa);
+    auto attrMap = GetAttrMap(e);
     auto attrMapParent = GetAttrMapParent(e);
 
     if (eName == "geometry") {
@@ -37,19 +35,19 @@ bool QQE::ColladaVisitor::VisitEnter_library_geometries(const tinyxml2::XMLEleme
 
     } else if (eName == "source") {
 
-        pMeshSourceTmp                          = std::make_shared<QQE::MeshSource>();
+        pMeshSourceTmp                          = QSharedPointer<QQE::MeshSource>::create();
         pMeshTmp->meshSourceMap[attrMap["id"]]  = pMeshSourceTmp;
 
     } else if (eName == "accessor") {
 
-        std::stringstream{std::string{attrMap["count"]}}    >> pMeshSourceTmp->pointsCount;
-        std::stringstream{std::string{attrMap["stride"]}}   >> pMeshSourceTmp->stride;
+        std::stringstream{attrMap["count"].toStdString()}    >> pMeshSourceTmp->pointsCount;
+        std::stringstream{attrMap["stride"].toStdString()}   >> pMeshSourceTmp->stride;
 
     } else if (eName == "param") {
 
         if (parentName == "accessor") {
 
-            pMeshSourceTmp->axisOrder += std::string{attrMap["name"]};
+            pMeshSourceTmp->axisOrder += attrMap["name"];
 
         }
 
@@ -57,14 +55,14 @@ bool QQE::ColladaVisitor::VisitEnter_library_geometries(const tinyxml2::XMLEleme
         
         //Get Mesh Index in the float array data
         pMeshSourceTmp->index                               =  pMeshTmp->floatVector.size();
-        std::stringstream{std::string{attrMap["count"]}}    >> pMeshSourceTmp->size;
+        std::stringstream{attrMap["count"].toStdString()}    >> pMeshSourceTmp->size;
         
         //Resize Vector
         pMeshTmp->floatVector.resize(pMeshSourceTmp->index + pMeshSourceTmp->size);
         auto newSize = pMeshTmp->floatVector.size();
 
         //Parse the floats
-        auto theFloats = std::stringstream{GetElementText(e)};
+        auto theFloats = std::stringstream{GetElementText(e).toStdString()};
         for (auto index = pMeshSourceTmp->index; index < newSize; index++){
 
             theFloats >> pMeshTmp->floatVector[index];
@@ -74,7 +72,7 @@ bool QQE::ColladaVisitor::VisitEnter_library_geometries(const tinyxml2::XMLEleme
     } else if (eName == "p") {
 
         auto size = pMeshTrianglesTmp->count * 3;
-        auto indexArrayStream = std::stringstream{GetElementText(e)};
+        auto indexArrayStream = std::stringstream{GetElementText(e).toStdString()};
         for (unsigned int pos = 0; pos < size; ++pos){
             
             unsigned int index;
@@ -87,24 +85,24 @@ bool QQE::ColladaVisitor::VisitEnter_library_geometries(const tinyxml2::XMLEleme
 
         if (parentName == "vertices"){
 
-            auto idKey                                      = std::string{attrMap["source"].c_str() + 1};
+            auto idKey                                      = attrMap["source"].toStdString().data() + 1;
             pMeshTmp->meshSourceMap[attrMapParent["id"]]    = pMeshTmp->meshSourceMap[idKey];
 
         } else if (parentName == "triangles") {
 
             auto aMeshTriangleInput                 = QQE::MeshTrianglesInput{};
-            aMeshTriangleInput.source               = std::string{attrMap["source"].c_str() + 1};
+            aMeshTriangleInput.source               = attrMap["source"].toStdString().data() + 1;
             aMeshTriangleInput.semanticType         = aMeshTriangleInput.semanticTypeMap[attrMap["semantic"]];
-            std::stringstream{attrMap["offset"]}    >> aMeshTriangleInput.offset;
+            std::stringstream{attrMap["offset"].toStdString()} >> aMeshTriangleInput.offset;
             pMeshTrianglesTmp->meshTrianglesInput.push_back(aMeshTriangleInput);
 
         }
 
     } else if (eName == "triangles") {
 
-        pMeshTrianglesTmp                       = std::make_shared<QQE::MeshTriangles>();
-        std::stringstream{attrMap["count"]}     >> pMeshTrianglesTmp->count;
-        std::stringstream{attrMap["material"]}  >> pMeshTrianglesTmp->material;
+        pMeshTrianglesTmp                       = QSharedPointer<QQE::MeshTriangles>::create();
+        std::stringstream{attrMap["count"].toStdString()}     >> pMeshTrianglesTmp->count;
+        std::stringstream{attrMap["material"].toStdString()}  >> pMeshTrianglesTmp->material;
 
     } 
 

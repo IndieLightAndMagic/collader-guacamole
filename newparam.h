@@ -2,7 +2,6 @@
 #define __NEWPARAM_H__
 
 #include "idname.h"
-#include <glm/ext.hpp>
 
 namespace QQE {
 
@@ -12,20 +11,20 @@ namespace QQE {
             SAMPLER2D
         };    
         ParamType paramType;
-        virtual void SetIdName(const tinyxml2::XMLAttribute* pa) override;
+        virtual void SetIdName(const QDomNamedNodeMap& pa) override;
     };
-    using NewParamPtr = std::shared_ptr<NewParam>;
+    using NewParamPtr = QSharedPointer<NewParam>;
     
     struct Surface  : public QQE::NewParam {
 
-        std::string init_from{};
-        glm::ivec4  format{glm::ivec4(0,0,0,0)};
+        QString init_from{};
+        QVector<int> format{0,0,0,0};
     
     };
     
     struct Sampler2D : public QQE::NewParam {
 
-        std::string source{};
+        QString source{};
 
 
     };

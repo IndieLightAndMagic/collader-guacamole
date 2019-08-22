@@ -1,22 +1,20 @@
 //http://www.wazim.com/Collada_Tutorial_1.htm
 #include "collader.h"
+#include <sstream>
 
 
-using namespace tinyxml2;
-using namespace std;
+QSharedPointer<QQE::Light> pLightTmp = nullptr;
 
-std::shared_ptr<QQE::Light> pLightTmp = nullptr;
-
-bool QQE::ColladaVisitor::VisitExit_library_lights(const tinyxml2::XMLElement &e){
+bool QQE::ColladaVisitor::VisitExit_library_lights(const QDomElement& e){
 
     return true;
 }
 
-bool QQE::ColladaVisitor::VisitEnter_library_lights(const tinyxml2::XMLElement &e, const tinyxml2::XMLAttribute *pa){
+bool QQE::ColladaVisitor::VisitEnter_library_lights(const QDomElement& e, const QDomNamedNodeMap& pa){
 
-    auto eName = std::string{e.Name()};
-    auto attrMap = GetAttrMap(pa);
-    auto textString = std::stringstream{GetElementText(e)};
+    auto eName = e.nodeName();
+    auto attrMap = GetAttrMap(e);
+    auto textString = std::stringstream{GetElementText(e).toStdString()};
 
     if (eName == "light"){
 
@@ -25,9 +23,16 @@ bool QQE::ColladaVisitor::VisitEnter_library_lights(const tinyxml2::XMLElement &
 
     } else if (eName == "color") {
 
-        textString >> pLightTmp->color.r;
-        textString >> pLightTmp->color.g;
-        textString >> pLightTmp->color.b;
+        auto red = 0.0f;
+        auto green = 0.0f;
+        auto blue = 0.0f;
+
+        textString >> red;
+        pLightTmp->color.setX(red);
+        textString >> green;
+        pLightTmp->color.setY(green);
+        textString >> blue;
+        pLightTmp->color.setZ(blue);
 
     } else if (eName == "linear_attenuation") {
 

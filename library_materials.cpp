@@ -2,18 +2,15 @@
 #include "collader.h"
 
 
-using namespace tinyxml2;
-using namespace std;
+QSharedPointer<QQE::Material> pMaterialTmp = nullptr;
 
-std::shared_ptr<QQE::Material> pMaterialTmp = nullptr;
-
-bool QQE::ColladaVisitor::VisitExit_library_materials(const tinyxml2::XMLElement& e){
+bool QQE::ColladaVisitor::VisitExit_library_materials(const QDomElement& e){
 
     return true;
 }
-bool QQE::ColladaVisitor::VisitEnter_library_materials(const tinyxml2::XMLElement& e, const tinyxml2::XMLAttribute* pa){
+bool QQE::ColladaVisitor::VisitEnter_library_materials(const QDomElement& e, const QDomNamedNodeMap& pa){
 
-    auto eName = std::string{e.Name()};
+    auto eName = e.nodeName();
 
     if( eName == "material"){
 
@@ -22,8 +19,8 @@ bool QQE::ColladaVisitor::VisitEnter_library_materials(const tinyxml2::XMLElemen
 
     } else if (eName == "instance_effect") {
 
-        auto attrMap = GetAttrMap(pa);
-        auto pUrlValue = attrMap["url"].c_str() + 1;
+        auto attrMap = GetAttrMap(e);
+        auto pUrlValue = attrMap["url"].toStdString().data() + 1;
         pMaterialTmp->effectUrl = std::string{pUrlValue};
 
 

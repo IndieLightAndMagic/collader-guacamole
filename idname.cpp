@@ -1,13 +1,20 @@
 #include "idname.h"
 
 using namespace QQE;
-void IdName::SetIdName(const tinyxml2::XMLAttribute *pa){
+void IdName::SetIdName(const QDomNamedNodeMap& e){
 
-	assert(pa != nullptr);
-	id = pa->Value(); //Get Id Attribute
-	auto next = pa->Next();
-	assert(next != nullptr);
-	if (next) name = next->Value(); //Get Name Attribute
+    auto attrCount = e.length();
+
+    for (auto index = 0; index < attrCount; ++index){
+
+        auto attr = e.item(index);
+        if (attr.nodeName() == "id"){
+            id = attr.nodeValue();
+        } else if (attr.nodeName() == "name") {
+            name = attr.nodeValue();
+        }
+
+    }
 
 }
         

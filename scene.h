@@ -2,11 +2,7 @@
 #define __SCENE_H__
 
 
-#include <iostream>
-#include <memory>
-#include <string>
-#include <vector>
-#include <map>
+
 
 #include "idname.h"
 #include "node.h"
@@ -27,22 +23,22 @@ namespace QQE {
 
         bool z_up{false};
 
-        std::string authoring_tool{};
-        std::string created{};
-        std::string modified{};
+        QString authoring_tool{};
+        QString created{};
+        QString modified{};
 
         //---------- These are indexed with natural names ---------------//
-        std::map<std::string, std::shared_ptr<QQE::Node>> nodes{};
-        std::map<std::string, std::shared_ptr<QQE::Mesh>> meshes{};
-        std::map<std::string, std::shared_ptr<QQE::Camera>> cameras{};
-        std::map<std::string, std::shared_ptr<QQE::Light>> lights{};
+        QMap<QString, QSharedPointer<QQE::Node>> nodes{};
+        QMap<QString, QSharedPointer<QQE::Mesh>> meshes{};
+        QMap<QString, QSharedPointer<QQE::Camera>> cameras{};
+        QMap<QString, QSharedPointer<QQE::Light>> lights{};
 
         //--------- These are indexed with url and ids  ----------//
-        std::map<std::string, std::shared_ptr<QQE::Effect>> shaders{};
-        std::map<std::string, std::shared_ptr<QQE::Image>> images{};
-        std::map<std::string, std::shared_ptr<QQE::Material>> materials{};
-        std::map<std::string, std::shared_ptr<QQE::NewParam>> parameters{};
-        std::map<std::string, std::shared_ptr<QQE::IdName>> urlPtrMap;
+        QMap<QString, QSharedPointer<QQE::Effect>> shaders{};
+        QMap<QString, QSharedPointer<QQE::Image>> images{};
+        QMap<QString, QSharedPointer<QQE::Material>> materials{};
+        QMap<QString, QSharedPointer<QQE::NewParam>> parameters{};
+        QMap<QString, QWeakPointer<QQE::IdName>> urlPtrMap{};
 
 
     };

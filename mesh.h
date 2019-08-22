@@ -16,7 +16,7 @@ namespace QQE {
 
         unsigned int    pointsCount{0};
         unsigned int    stride{0};
-        std::string     axisOrder{};
+        QString         axisOrder{};
         unsigned int    index;
         unsigned int    size;
 
@@ -35,10 +35,11 @@ namespace QQE {
         std::string                         source{};
         unsigned int                        offset{0};
         
-        std::map<std::string, QQE::MeshTrianglesInput::DataType> semanticTypeMap{
             std::make_pair("VERTEX", QQE::MeshTrianglesInput::DataType::VERTEX),
             std::make_pair("NORMAL", QQE::MeshTrianglesInput::DataType::NORMAL),
             std::make_pair("TEXCOORD", QQE::MeshTrianglesInput::DataType::TEXCOORD)
+        QMap<QString, QQE::MeshTrianglesInput::DataType> semanticTypeMap {
+
         };             
 
         
@@ -56,9 +57,9 @@ namespace QQE {
 
     struct Mesh : public QQE::IdName {
 
-        std::map<std::string, std::shared_ptr<QQE::MeshSource>>   meshSourceMap{};
-        std::vector<std::shared_ptr<QQE::MeshTriangles>>          triangleArray{};
-        std::vector<float>                                          floatVector{};
+        QMap<QString, QSharedPointer<QQE::MeshSource>>   meshSourceMap{};
+        QVector<QSharedPointer<QQE::MeshTriangles>>      triangleArray{};
+        QVector<float>                                   floatVector{};
 
     };
 

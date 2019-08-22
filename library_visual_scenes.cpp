@@ -1,21 +1,22 @@
 //http://www.wazim.com/Collada_Tutorial_1.htm
+#include <QSharedPointer>
+#include <QMatrix4x4>
+#include <sstream>
 #include "collader.h"
 
 
-using namespace tinyxml2;
-using namespace std;
 
-std::shared_ptr<QQE::Node> pNodeTmp;
+QSharedPointer<QQE::Node> pNodeTmp;
 
-bool QQE::ColladaVisitor::VisitExit_library_visual_scenes(const tinyxml2::XMLElement &e){
+bool QQE::ColladaVisitor::VisitExit_library_visual_scenes(const QDomElement& e){
 
     return true;
 }
-bool QQE::ColladaVisitor::VisitEnter_library_visual_scenes(const tinyxml2::XMLElement &e, const tinyxml2::XMLAttribute *pa){
+bool QQE::ColladaVisitor::VisitEnter_library_visual_scenes(const QDomElement& e, const QDomNamedNodeMap& pa){
 
-    auto eName = std::string{e.Name()};
-    auto attrMap = GetAttrMap(pa);
-    auto textString = std::stringstream{GetElementText(e)};
+    auto eName = e.nodeName();
+    auto attrMap = GetAttrMap(e);
+    auto textString = std::stringstream{GetElementText(e).toStdString()};
 
     if (eName == "visual_scene"){
 
@@ -24,41 +25,48 @@ bool QQE::ColladaVisitor::VisitEnter_library_visual_scenes(const tinyxml2::XMLEl
     } else if (eName == "node"){
 
         pNodeTmp                       = CreateElement<QQE::Node>(pa);
-        aScene->nodes[pNodeTmp->name]   = pNodeTmp;
+        aScene->nodes[pNodeTmp->name]   = pNodeTmp.toWeakRef();
 
     } else if (eName == "matrix") {
 
-        std::vector<glm::vec4> rows{};
+        QVector<QVector4D> rows{};
 
 
         for (int index = 0; index < 4; ++index){
             
             float x,y,z,w;
             textString >> x; textString >> y; textString >> z; textString >> w;
-            rows.push_back(glm::vec4{x,y,z,w});
+            rows.push_back(QVector4D{x,y,z,w});
 
         }
         
-        pNodeTmp->transform = glm::mat4{rows[0], rows[1], rows[2], rows[3]};
+        pNodeTmp->transform = QMatrix4x4{
+            rows[0][0], rows[0][1], rows[0][2], rows[0][3],
+            rows[1][0], rows[1][1], rows[1][2], rows[1][3],
+            rows[2][0], rows[2][1], rows[2][2], rows[2][3],
+            rows[3][0], rows[3][1], rows[3][2], rows[3][3]};
 
     } else if (pNodeTmp->nodeTypeMap.find(eName) != pNodeTmp->nodeTypeMap.end()){
-
-        auto pUrl           = attrMap["url"].c_str() + 1;
-        pNodeTmp->url       = std::string{pUrl};
+        auto pUrlString     = attrMap["url"].toStdString();
+        auto pUrl           = pUrlString.data() + 1;
+        pNodeTmp->url       = QString{pUrl};
         pNodeTmp->nodeType  = pNodeTmp->nodeTypeMap[eName];
 
     } else if (eName == "instance_material") {
 
         auto symbol                 = attrMap["symbol"];
-        auto target                 = std::string{attrMap["target"].c_str() + 1};
-        
-        for ( auto& url_idname: aScene->urlPtrMap){
+        auto target                 = QString{attrMap["target"].data() + 1};
+
+        auto& urlmap = aScene->urlPtrMap;
+        for ( auto urlmapiterator = urlmap.begin(); urlmapiterator != urlmap.end(); ++urlmapiterator){
 
             //Lookout for target
-            if (url_idname.first != target) continue;
+            auto url = urlmapiterator.key();
+            if ( url != target ) continue;
+            auto value = urlmapiterator.value();
 
             //Target found, create a new entry pointer to the same idname;
-            aScene->urlPtrMap[symbol]    = url_idname.second;
+            aScene->urlPtrMap[symbol]    = value;
 
         }
 

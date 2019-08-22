@@ -1,9 +1,8 @@
 #ifndef __LIGHT_H__
 #define __LIGHT_H__
 
-#include "glm/glm.hpp"
-
 #include "idname.h"
+#include <QVector3D>
 
 namespace QQE {
 
@@ -14,9 +13,9 @@ namespace QQE {
         float linear_attenuaton{0.0f};
         float quadratic_attenuation{0.0f};
 
-        glm::vec3 color{1.0f, 0.0f, 0.0f};
+        QVector3D color{1.0f, 0.0f, 0.0f};
         LightType lightType{QQE::Light::LightType::POINT};
-        
+
     };
 
 }

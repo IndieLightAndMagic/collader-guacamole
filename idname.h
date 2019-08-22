@@ -1,25 +1,22 @@
 #ifndef __IDNAME_H__
 #define __IDNAME_H__
 
-#include <tinyxml2.h>
 
-#include <map>
-#include <memory>
-#include <cassert>
-#include <iostream>
-
+#include <QMap>
+#include <QDomElement>
+#include <QWeakPointer>
 
 
 namespace QQE {
 	
 	struct IdName;
-	using IdMap = std::map<std::string, std::shared_ptr<QQE::IdName>>;
-    
+
+	using IdMap = QMap<QString, QWeakPointer<QQE::IdName>>;
     struct IdName {
-        std::string id;
-        std::string name;
+        QString id;
+        QString name;
         
-        virtual void SetIdName(const tinyxml2::XMLAttribute *pa);
+        virtual void SetIdName(const QDomNamedNodeMap& e);
         
     };
     

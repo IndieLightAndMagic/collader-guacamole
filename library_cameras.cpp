@@ -1,17 +1,15 @@
 //http://www.wazim.com/Collada_Tutorial_1.htm
 #include "collader.h"
+#include <sstream>
 
+QSharedPointer<QQE::Camera> pCameraTmp = nullptr;
 
-using namespace tinyxml2;
-using namespace std;
+bool QQE::ColladaVisitor::VisitEnter_library_cameras(const QDomElement& e, const QDomNamedNodeMap& pa){
 
-std::shared_ptr<QQE::Camera> pCameraTmp = nullptr;
-
-bool QQE::ColladaVisitor::VisitEnter_library_cameras(const XMLElement& e, const XMLAttribute* pa){
-
-    auto eName          = std::string {e.Name()};
+    auto eName          = e.nodeName();
     auto pText          = GetElementText(e);
-    auto pTextString    = std::stringstream{pText};
+    auto pTextSS        = pText.toStdString();
+    auto pTextString    = std::stringstream{pTextSS};
     
     if (eName == "camera"){
 
@@ -48,7 +46,7 @@ bool QQE::ColladaVisitor::VisitEnter_library_cameras(const XMLElement& e, const 
 
 }        
 
-bool QQE::ColladaVisitor::VisitExit_library_cameras(const XMLElement& e){
+bool QQE::ColladaVisitor::VisitExit_library_cameras(const QDomElement& e){
 
     return true;
 

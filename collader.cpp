@@ -2,43 +2,48 @@
 #include "collader.h"
 
 
-using namespace tinyxml2;
 using namespace std;
 
 
-std::tuple<std::string, std::string, const char*> QQE::ColladaVisitor::GetNameParentText(const tinyxml2::XMLElement& e){
+QPair<QString, QPair<QString, QString>> QQE::ColladaVisitor::GetNameParentText(const QDomElement& e){
 
-    return std::make_tuple(std::string{e.Name()}, GetParentName(e), e.GetText());
+    auto parent = e.parentNode();
+    auto elementName = e.nodeName();
+    auto nodeText = e.text();
+    auto parentName = parent.nodeName();
+    auto parent_text = qMakePair(parentName, nodeText);
+    auto node__parent_text = qMakePair(elementName, parent_text);
+
+    return node__parent_text;
 
 }
 
-std::string QQE::ColladaVisitor::GetElementText(const XMLElement& e){
+QString QQE::ColladaVisitor::GetElementText(const QDomElement& e){
 
-    auto eText = e.GetText();
-    auto eTextString = (eText != nullptr) ? std::string{eText} : std::string{};
+    auto eText = e.text();
+    auto eTextString = (eText.isEmpty()) ? QString{} : QString{eText} ;
     return eTextString;
 
 }
 
-std::string QQE::ColladaVisitor::GetParentName(const XMLElement &e){
+QString QQE::ColladaVisitor::GetParentName(const QDomElement& e){
 
     //Get Parent dict
-    return std::string{reinterpret_cast<const tinyxml2::XMLElement*>(e.Parent())->Name()};
+    auto parent = e.parentNode();
+    return parent.nodeName();
 
 }
 
-bool QQE::ColladaVisitor::VisitEnter(const XMLElement& e, const XMLAttribute* pa){
+bool QQE::ColladaVisitor::VisitEnter(const QDomElement& e, const QDomNamedNodeMap& pa){
     
-    auto eName                      = std::string{e.Name()};
+    auto eName                      = e.nodeName();
     auto eNameSearchForVisitorState = stateMap.find(eName);
     auto eNameStateFound            = eNameSearchForVisitorState != stateMap.end();
-    auto& visitorState              = visitorStateDq.front();
-
-
+    auto& visitorState              = visitorStateDqS.top();
     if  ( eNameStateFound ){
 
         auto& visitorStateName = eName;
-        visitorStateDq.push_front(stateMap[visitorStateName]) ;
+        visitorStateDqS.push(stateMap[visitorStateName]);
 
     } else if (visitorState == ColladaVisitor::VisitorState::library_effects){
 
@@ -96,10 +101,10 @@ bool QQE::ColladaVisitor::VisitEnter(const XMLElement& e, const XMLAttribute* pa
     return true;
 }
 
-bool QQE::ColladaVisitor::VisitExit(const XMLElement& e){
+bool QQE::ColladaVisitor::VisitExit(const QDomElement& e){
 
-    auto eName         = std::string{e.Name()};
-    auto& visitorState = visitorStateDq.front();
+    auto eName         = e.nodeName();
+    auto& visitorState = visitorStateDqS.top();
     auto retValue      = true;
 
     if (visitorState == ColladaVisitor::VisitorState::library_geometries){
@@ -136,12 +141,52 @@ bool QQE::ColladaVisitor::VisitExit(const XMLElement& e){
 
     if (eNameStateFound){
 
-        visitorStateDq.pop_front();
+        visitorStateDqS.pop();
 
     }
 
     return retValue;
 }
+void QQE::ColladaVisitor::VisitNode(const QDomElement& pNode, int count = 0) {
 
+    auto pNodeName = pNode.nodeName();
 
+    auto msg = QString();
+    for (auto index = 0; index < count; ++index) msg+=' ';
+    qInfo() << msg+pNodeName;
+
+    VisitEnter(pNode, pNode.attributes());
+    auto child =  pNode.firstChildElement();
+    count++;
+    while (!child.isNull()){
+
+        VisitNode(child, count);
+        child = child.nextSiblingElement();
+
+    }
+    count--;
+    VisitExit(pNode);
+    if (!count){
+        auto aScene = GetScene();
+        auto& urlptrmap = aScene->urlPtrMap;
+        for(auto urlptrmapit = urlptrmap.begin(); urlptrmapit != urlptrmap.end(); ++urlptrmapit){
+            auto url = urlptrmapit.key();
+            auto wp = urlptrmapit.value();
+            auto sp = wp.lock();
+            auto msg = QString{sp ? "[[Object available]]" : "**Object not available**"};
+            msg = url + " => " + msg;
+            qInfo() << msg;
+        }
+    }
+}
+void QQE::ColladaVisitor::LoadColladaDocument(QFile*p){
+
+    QDomDocument xmlBOM;
+    xmlBOM.setContent(p);
+    p->close();
+
+    auto root = xmlBOM.documentElement();
+    VisitNode(root);
+
+}
 

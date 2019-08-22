@@ -1,14 +1,6 @@
 #ifndef __CAMERA_H__
 #define __CAMERA_H__
 
-#include "glm/glm.hpp"
-
-#define GLM_ENABLE_EXPERIMENTAL
-#include "glm/gtx/string_cast.hpp"
-
-#include <string>
-#include <iostream>
-
 #include "idname.h"
 
 namespace QQE {

@@ -1,18 +1,11 @@
 #ifndef __EFFECT_H__
 #define __EFFECT_H__
 
-#include <glm/glm.hpp>
-#define GLM_ENABLE_EXPERIMENTAL
-#include "glm/gtx/string_cast.hpp"
-
-#include <iostream>
-#include <memory>
-#include <string>
-#include <map>
 
 #include "idname.h"
 #include "material.h"
-
+#include <QPair>
+#include <QMatrix4x4>
 namespace QQE {
 
     struct Effect : public QQE::IdName {
@@ -25,18 +18,14 @@ namespace QQE {
         };
         
         std::map<std::string, QQE::Effect::ShaderType> shadertypemap {
-            std::make_pair("blinn", QQE::Effect::ShaderType::BLINN),
-            std::make_pair("phong", QQE::Effect::ShaderType::PHONG),
-            std::make_pair("lambert", QQE::Effect::ShaderType::LAMBERT),
-            std::make_pair("constant", QQE::Effect::ShaderType::CONSTANT)
-        };
+        QMap<QString, QQE::Effect::ShaderType> shadertypemap {};
 
 
-    	glm::vec4   			emission;
-        glm::vec4   			ambient;
-        glm::vec4   			diffuse;
-        glm::vec4   			specular;
-        glm::vec4				reflective;
+    	QVector4D   			emission;
+        QVector4D   			ambient;
+        QVector4D   			diffuse;
+        QVector4D   			specular;
+        QVector4D				reflective;
         float       			shininess;
         float					refractionIndex;
         Effect::ShaderType	    shaderType;

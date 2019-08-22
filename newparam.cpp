@@ -3,27 +3,27 @@
 #include <tuple>
 #include <functional>
 
-using namespace tinyxml2;
-using namespace std;
-
 using namespace QQE;
 
 
 
-QQE::NewParamPtr pNewParamTmp = nullptr;
-void QQE::NewParam::SetIdName(const tinyxml2::XMLAttribute* pa){
+QSharedPointer<QQE::NewParam> pNewParamTmp = nullptr;
+void QQE::NewParam::SetIdName(const QDomNamedNodeMap& pa){
 
-    assert(pa != nullptr);
-    id        = pa->Value();
-    auto next = pa->Next();
-    name      = next ? next->Value() : id;
+    id = pa.item(0).nodeValue();
+    name = pa.length() > 1 ? pa.item(1).nodeValue() : id;
 
 }
-bool QQE::ColladaVisitor::VisitEnter_newparam(const XMLElement& e, const XMLAttribute* pa){
+
+bool QQE::ColladaVisitor::VisitEnter_newparam(const QDomElement& e, const QDomNamedNodeMap& pa){
     
     //std::string, std::string, char* 
-    const auto& [eName, parentName, eText] = GetNameParentText(e);
-    
+    //const auto& [eName, parentName, eText] = GetNameParentText(e);
+    auto eName__parentName_eText = GetNameParentText(e);
+    auto eName = eName__parentName_eText.first;
+    auto parentName = eName__parentName_eText.second.first;
+    auto eText = eName__parentName_eText.second.second;
+
     
     if (eName == "newparam") {
 
@@ -31,8 +31,8 @@ bool QQE::ColladaVisitor::VisitEnter_newparam(const XMLElement& e, const XMLAttr
     else if (eName == "surface") {
         
         //Get parent dicitionary.
-        auto parent_e  = reinterpret_cast<const XMLElement*>(e.Parent());        
-        auto parent_pa = parent_e->FirstAttribute();
+        auto parent_e  = e.parentNode();
+        auto parent_pa = parent_e.attributes();
 
         //Reset the actual pointer.
         pNewParamTmp.reset();
@@ -41,48 +41,61 @@ bool QQE::ColladaVisitor::VisitEnter_newparam(const XMLElement& e, const XMLAttr
         pNewParamTmp                          = CreateElement<QQE::Surface>(parent_pa);
         
         //Set the type
-        aScene->parameters[pNewParamTmp->name] = pNewParamTmp;  
-        pNewParamTmp->paramType               = QQE::NewParam::ParamType::SURFACE;
+        aScene->parameters[pNewParamTmp->name] = pNewParamTmp.toWeakRef();
+        pNewParamTmp->paramType                = QQE::NewParam::ParamType::SURFACE;
 
     } else if (eName == "sampler2D") {
 
-        auto parent_e  = reinterpret_cast<const XMLElement*>(e.Parent());        
-        auto parent_pa = parent_e->FirstAttribute();
+        auto parent_e  = e.parentNode();
+        auto parent_pa = parent_e.attributes();
+
         pNewParamTmp.reset();
-        pNewParamTmp                          = CreateElement<QQE::Sampler2D>(parent_pa);
-        aScene->parameters[pNewParamTmp->name] = pNewParamTmp;  
-        pNewParamTmp->paramType               = QQE::NewParam::ParamType::SAMPLER2D;
+        pNewParamTmp                           = CreateElement<QQE::Sampler2D>(parent_pa);
+        aScene->parameters[pNewParamTmp->name] = pNewParamTmp.toWeakRef();
+        pNewParamTmp->paramType                = QQE::NewParam::ParamType::SAMPLER2D;
         
     } else if (eName == "init_from") {
 
-        auto pSurface       = std::dynamic_pointer_cast<QQE::Surface>(pNewParamTmp);
-        pSurface->init_from = std::string{eText};
+        auto pSurface = pNewParamTmp.dynamicCast<QQE::Surface>(); //std::dynamic_pointer_cast<QQE::Surface>(pNewParamTmp);
+        if (pSurface == Q_NULLPTR){
+            pNewParamTmp.reset();
+            pSurface = QSharedPointer<QQE::Surface>::create();
+            pNewParamTmp = pSurface;
+        }
+        pSurface->init_from = eText;
 
     } else if (eName == "format") {
 
-        auto pSurface       = std::dynamic_pointer_cast<QQE::Surface>(pNewParamTmp);
-        auto pComponentChar = eText;
+        auto pSurface = pNewParamTmp.dynamicCast<QQE::Surface>();//std::dynamic_pointer_cast<QQE::Surface>(pNewParamTmp);
+        if (pSurface == Q_NULLPTR){
+            pNewParamTmp.reset();
+            pSurface = QSharedPointer<QQE::Surface>::create();
+            pNewParamTmp = pSurface;
+        }
+        auto pComponentChar = eText.toStdString().data();
         auto chartobase10 = [](auto& b10, auto& c){
             b10 = b10 * 0x0a + c - 0x30;
             return; 
         };
 
-        std::map<char, std::function<void(unsigned char)>> parseDict {
+        QMap<char, std::function<void(unsigned char)>> parseDict {
             std::make_pair('A', [&](unsigned char bitsPerChannel){ 
-                chartobase10(pSurface->format.r, bitsPerChannel);
+                chartobase10(pSurface->format[0], bitsPerChannel);
             }),
             std::make_pair('R', [&](unsigned char bitsPerChannel){ 
-                chartobase10(pSurface->format.g, bitsPerChannel);
+                chartobase10(pSurface->format[1], bitsPerChannel);
             }),
             std::make_pair('G', [&](unsigned char bitsPerChannel){ 
-                chartobase10(pSurface->format.b, bitsPerChannel);
+                chartobase10(pSurface->format[2], bitsPerChannel);
             }),
             std::make_pair('B', [&](unsigned char bitsPerChannel){ 
-                chartobase10(pSurface->format.a, bitsPerChannel);
+                chartobase10(pSurface->format[3], bitsPerChannel);
             })
         };
 
         while (*pComponentChar){
+            auto pComponentChar_ = *pComponentChar;
+
             if (parseDict.find(*pComponentChar) != parseDict.end()){
                 parseDict[*pComponentChar](*(pComponentChar+1));
             }
@@ -92,14 +105,17 @@ bool QQE::ColladaVisitor::VisitEnter_newparam(const XMLElement& e, const XMLAttr
 
     } else if (eName == "source") {
 
-        auto pSampler2D = std::dynamic_pointer_cast<QQE::Sampler2D>(pNewParamTmp);
-        pSampler2D->source = std::string{eText};
+        auto pSampler2D = pNewParamTmp.dynamicCast<QQE::Sampler2D>(); //std::dynamic_pointer_cast<QQE::Sampler2D>(pNewParamTmp);
+        if (pSampler2D == Q_NULLPTR){
+            pSampler2D = QSharedPointer<QQE::Sampler2D>::create();
+        }
+        pSampler2D->source = eText;
 
     }
     return true;    
 
 }  
-bool QQE::ColladaVisitor::VisitExit_newparam(const tinyxml2::XMLElement& e){
+bool QQE::ColladaVisitor::VisitExit_newparam(const QDomElement& e){
 
 
     return true;

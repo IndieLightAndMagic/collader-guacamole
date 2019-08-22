@@ -1,25 +1,17 @@
 #ifndef __COLLADER_H__
 #define __COLLADER_H__
 
-
-#include <tinyxml2.h>
-#include <glm/glm.hpp>
-
-#include <string>
-#include <cassert>
-#include <iostream>
-#include <sstream>
-#include <utility>
-#include <vector>
-#include <deque>
-#include <tuple>
-#include <map>
-
+#include <QSharedPointer>
+#include <QMap>
+#include <QPair>
+#include <QQueue>
+#include <QStack>
+#include <QFile>
 #include "scene.h"
 
 namespace QQE {
 
-    class ColladaVisitor : public tinyxml2::XMLVisitor {
+    class ColladaVisitor {
 
 
 
@@ -60,33 +52,33 @@ namespace QQE {
         
         };
 
-        bool VisitEnter_library_effects(const tinyxml2::XMLElement& e, const tinyxml2::XMLAttribute* pa);
-        bool VisitEnter_library_images(const tinyxml2::XMLElement& e, const tinyxml2::XMLAttribute* pa);
-        bool VisitEnter_library_materials(const tinyxml2::XMLElement& e, const tinyxml2::XMLAttribute* pa);
-        bool VisitEnter_library_geometries(const tinyxml2::XMLElement& e, const tinyxml2::XMLAttribute* pa);
-        bool VisitEnter_library_cameras(const tinyxml2::XMLElement& e, const tinyxml2::XMLAttribute* pa);
-        bool VisitEnter_library_lights(const tinyxml2::XMLElement &e, const tinyxml2::XMLAttribute *pa);
-        bool VisitEnter_library_visual_scenes(const tinyxml2::XMLElement &e, const tinyxml2::XMLAttribute *pa);
-        bool VisitEnter_newparam(const tinyxml2::XMLElement &e, const tinyxml2::XMLAttribute *pa);
+        bool VisitEnter_library_effects(const QDomElement& e, const QDomNamedNodeMap& pa);
+        bool VisitEnter_library_images(const QDomElement& e, const QDomNamedNodeMap& pa);
+        bool VisitEnter_library_materials(const QDomElement& e, const QDomNamedNodeMap& pa);
+        bool VisitEnter_library_geometries(const QDomElement& e, const QDomNamedNodeMap& pa);
+        bool VisitEnter_library_cameras(const QDomElement& e, const QDomNamedNodeMap& pa);
+        bool VisitEnter_library_lights(const QDomElement& e, const QDomNamedNodeMap& pa);
+        bool VisitEnter_library_visual_scenes(const QDomElement& e, const QDomNamedNodeMap& pa);
+        bool VisitEnter_newparam(const QDomElement& e, const QDomNamedNodeMap& pa);
 
-        bool VisitExit_library_geometries(const tinyxml2::XMLElement& e);
-        bool VisitExit_library_images(const tinyxml2::XMLElement& e);
-        bool VisitExit_library_cameras(const tinyxml2::XMLElement& e);
-        bool VisitExit_library_materials(const tinyxml2::XMLElement& e);
-        bool VisitExit_library_effects(const tinyxml2::XMLElement& e);
-        bool VisitExit_library_lights(const tinyxml2::XMLElement &e);
-        bool VisitExit_library_visual_scenes(const tinyxml2::XMLElement &e);
-        bool VisitExit_newparam(const tinyxml2::XMLElement &e);
+        bool VisitExit_library_geometries(const QDomElement& e);
+        bool VisitExit_library_images(const QDomElement& e);
+        bool VisitExit_library_cameras(const QDomElement& e);
+        bool VisitExit_library_materials(const QDomElement& e);
+        bool VisitExit_library_effects(const QDomElement& e);
+        bool VisitExit_library_lights(const QDomElement& e);
+        bool VisitExit_library_visual_scenes(const QDomElement& e);
+        bool VisitExit_newparam(const QDomElement& e);
 
         template <typename T>
-        std::shared_ptr<T> CreateElement(const tinyxml2::XMLAttribute* pa){
+        QSharedPointer<T> CreateElement(const QDomNamedNodeMap& pa){
             
-            auto p = std::make_shared<T>();
+            auto p = QSharedPointer<T>::create();
             
             if ( p ) {
 
                 p->SetIdName(pa);
-                aScene->urlPtrMap[p->id]    = p;
+                aScene->urlPtrMap[p->id]    = p.toWeakRef();
                 return p;
             
             } else return nullptr;  
@@ -95,40 +87,59 @@ namespace QQE {
     public:
         
 
-        std::deque<VisitorState> visitorStateDq{VisitorState::none};
-        bool VisitEnter(const tinyxml2::XMLElement& e, const tinyxml2::XMLAttribute* pa);
-        bool VisitExit(const tinyxml2::XMLElement& e);
-                
+        //std::deque<VisitorState> visitorStateDq{VisitorState::none};
+        QQueue<VisitorState> visitorStateDqQ{};
+        QStack<VisitorState> visitorStateDqS{};
 
-    //Utils
-        using AttrMap = std::map<std::string, std::string>;
-        AttrMap GetAttrMap (const tinyxml2::XMLAttribute* pa){
 
-            auto attrMap = AttrMap{}; 
-            for (;pa; pa = pa->Next()){
-                attrMap[std::string{pa->Name()}] = std::string{pa->Value()};
+
+
+        bool VisitEnter(const QDomElement& e, const QDomNamedNodeMap& pa);
+        bool VisitExit(const QDomElement& e);
+
+        void VisitNode(const QDomElement&, int);
+        void LoadColladaDocument(QFile*);
+
+
+        //Utils
+        using AttrMap = QMap<QString, QString>;
+        AttrMap GetAttrMap (const QDomNode& e){
+
+            auto pa = e.attributes();
+            auto attrMap = AttrMap{};
+            auto attributesCount = pa.length();
+
+            for (auto index = 0; index < attributesCount; ++index){
+
+                auto attr = pa.item(index);
+                auto attrName = attr.nodeName();
+                auto attrValue = attr.nodeValue();
+                attrMap[attrName] = attrValue;
+
             }
+
             return attrMap;
+
         }
-        AttrMap GetAttrMapParent(const tinyxml2::XMLElement& e){
+
+        AttrMap GetAttrMapParent(const QDomNode& e){
 
             //Get Parent dict
-            auto ppa = reinterpret_cast<const tinyxml2::XMLElement*>(e.Parent())->FirstAttribute();
-            auto attrMapParent = GetAttrMap(ppa);
-
-            return attrMapParent;    
+            auto parentNode = e.parentNode();
+            auto attrMapParent = GetAttrMap(parentNode);
+            return attrMapParent;
 
         }
 
-        std::string GetElementText(const tinyxml2::XMLElement& e);
+        QString GetElementText(const QDomElement& e);
 
-        std::string GetParentName(const tinyxml2::XMLElement& e);        
+        QString GetParentName(const QDomElement& e);
 
-        std::shared_ptr<const Scene> GetScene(){
+        QSharedPointer<const Scene> GetScene(){
             return aScene;
         }
 
-        std::tuple<std::string, std::string, const char*> GetNameParentText(const tinyxml2::XMLElement& e);
+        QPair<QString, QPair<QString, QString>> GetNameParentText(const QDomElement& e);
 
         void PrintSceneInfo();
     };
