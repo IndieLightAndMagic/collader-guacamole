@@ -17,8 +17,13 @@ namespace QQE {
             PHONG = 3 
         };
         
-        std::map<std::string, QQE::Effect::ShaderType> shadertypemap {
-        QMap<QString, QQE::Effect::ShaderType> shadertypemap {};
+        QMap<QString, QQE::Effect::ShaderType> shadertypemap {
+            std::make_pair("blinn", QQE::Effect::ShaderType::BLINN),
+            std::make_pair("phong", QQE::Effect::ShaderType::PHONG),
+            std::make_pair("lambert", QQE::Effect::ShaderType::LAMBERT),
+            std::make_pair("constant", QQE::Effect::ShaderType::CONSTANT)
+
+        };
 
 
     	QVector4D   			emission;

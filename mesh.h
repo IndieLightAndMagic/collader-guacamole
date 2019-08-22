@@ -35,10 +35,10 @@ namespace QQE {
         std::string                         source{};
         unsigned int                        offset{0};
         
+        QMap<QString, QQE::MeshTrianglesInput::DataType> semanticTypeMap {
             std::make_pair("VERTEX", QQE::MeshTrianglesInput::DataType::VERTEX),
             std::make_pair("NORMAL", QQE::MeshTrianglesInput::DataType::NORMAL),
             std::make_pair("TEXCOORD", QQE::MeshTrianglesInput::DataType::TEXCOORD)
-        QMap<QString, QQE::MeshTrianglesInput::DataType> semanticTypeMap {
 
         };             
 

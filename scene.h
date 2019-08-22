@@ -23,7 +23,7 @@ namespace QQE {
 
         bool z_up{false};
 
-        QString authoring_tool{};
+        QString authoring_tool;
         QString created{};
         QString modified{};
 

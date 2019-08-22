@@ -30,12 +30,16 @@ namespace QQE {
             newparam,
             scene
         };
+        ColladaVisitor(){
+            visitorStateDqS.push(ColladaVisitor::VisitorState::none);
+        }
+
     private:
         
 
-        std::shared_ptr<QQE::Scene> aScene{std::make_shared<QQE::Scene>()};
+        QSharedPointer<QQE::Scene> aScene{QSharedPointer<QQE::Scene>::create()};
 
-        std::map<std::string, ColladaVisitor::VisitorState > stateMap {
+        QMap<QString, ColladaVisitor::VisitorState > stateMap {
             
             std::make_pair("asset",                 ColladaVisitor::VisitorState::asset),
             std::make_pair("library_cameras",       ColladaVisitor::VisitorState::library_cameras),

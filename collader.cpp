@@ -20,9 +20,7 @@ QPair<QString, QPair<QString, QString>> QQE::ColladaVisitor::GetNameParentText(c
 
 QString QQE::ColladaVisitor::GetElementText(const QDomElement& e){
 
-    auto eText = e.text();
-    auto eTextString = (eText.isEmpty()) ? QString{} : QString{eText} ;
-    return eTextString;
+    return e.text();
 
 }
 
@@ -39,7 +37,7 @@ bool QQE::ColladaVisitor::VisitEnter(const QDomElement& e, const QDomNamedNodeMa
     auto eName                      = e.nodeName();
     auto eNameSearchForVisitorState = stateMap.find(eName);
     auto eNameStateFound            = eNameSearchForVisitorState != stateMap.end();
-    auto& visitorState              = visitorStateDqS.top();
+    auto visitorState              = visitorStateDqS.top();
     if  ( eNameStateFound ){
 
         auto& visitorStateName = eName;
@@ -104,7 +102,7 @@ bool QQE::ColladaVisitor::VisitEnter(const QDomElement& e, const QDomNamedNodeMa
 bool QQE::ColladaVisitor::VisitExit(const QDomElement& e){
 
     auto eName         = e.nodeName();
-    auto& visitorState = visitorStateDqS.top();
+    auto visitorState = visitorStateDqS.top();
     auto retValue      = true;
 
     if (visitorState == ColladaVisitor::VisitorState::library_geometries){
